@@ -2,16 +2,18 @@ const fs = require("fs-extra");
 const path = require("path");
 const {web3, web3Network} = require("./web3");
 const compiledContract = require("./build/Election.json");
-const jsonfile = require('jsonfile');
+// const jsonfile = require('jsonfile');
+const circularJSON = require('circular-json');
 
 const deploy = async () => {
-    let receiptPath;
+    try {
+        let receiptPath;
     if (web3Network == "ganache") {
-        receiptPath = path.resolve("receipt-"+web3Network+".json");
+        receiptPath = path.resolve("ethereum","receipt-"+web3Network+".json");
         console.log("---------- receipt path --------", receiptPath);
     }
     else if (web3Network == "rinkeby") {
-        receiptPath = path.resolve("receipt-"+web3Network+".json");
+        receiptPath = path.resolve("ethereum","receipt-"+web3Network+".json");
         console.log("---------- receipt path --------", receiptPath);
     }
 
@@ -37,10 +39,16 @@ const deploy = async () => {
 
     console.log("Contract deployed to ", result.options.address);
 
-    jsonfile.writeFileSync(receiptPath, result.options);
+    const serialised = circularJSON.stringify(result.options);
+    fs.writeJsonSync(receiptPath,result.options);
+    //.writeFileSync(receiptPath, result.options);
     console.log("receipt saved successfully");
-    return await result;
+    return await serialised;
+    } catch (error) {
+        console.error(error);
+        return error;
+    }
 }
 
 // deploy();
-module.exports = deploy();
+module.exports = deploy;
