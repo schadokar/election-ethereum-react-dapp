@@ -1,11 +1,11 @@
 const fs = require("fs-extra");
 const path = require("path");
 const {web3, web3Network} = require("./web3");
-const compiledContract = require("./build/Election.json");
+const compiledContract = require("./build/ElectionFactory.json");
 // const jsonfile = require('jsonfile');
 const circularJSON = require('circular-json');
 
-const deploy = async () => {
+const deploy = async (electionTimePeriod) => {
     try {
         let receiptPath;
     if (web3Network == "ganache") {
@@ -34,7 +34,7 @@ const deploy = async () => {
     const result = await new web3.eth.Contract(
         JSON.parse(compiledContract.interface)
     )
-    .deploy({data: compiledContract.bytecode})
+    .deploy({data: compiledContract.bytecode, arguments: [electionTimePeriod]})
     .send({gas: 3000000, from: accounts[0]});
 
     console.log("Contract deployed to ", result.options.address);
@@ -50,5 +50,5 @@ const deploy = async () => {
     }
 }
 
-// deploy();
+deploy(300);
 module.exports = deploy;

@@ -7,7 +7,7 @@ const compile = () => {
         const buildPath = path.resolve(__dirname,"./build");
     fs.removeSync(buildPath);
 
-    const contractPath = path.resolve(__dirname,"./contracts","election.sol");
+    const contractPath = path.resolve(__dirname,"./contracts","Election.sol");
     console.log(contractPath);
     const source = fs.readFileSync(contractPath, "utf8");
     const output = solc.compile(source, 1).contracts;
@@ -28,6 +28,6 @@ const compile = () => {
     }
 };
 
-// console.log(compile());
+console.log(compile());
 
 module.exports = compile;
