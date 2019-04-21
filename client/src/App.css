@@ -4,71 +4,70 @@
 */
 
 body {
-  width: 800px;
-  margin: 0 auto;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
+  background-image: url("./images/got_map.jpg");
+  width: auto;
 }
-.container {
-  width: 600px;
-  margin: 0 auto;
+
+.header {
+  color: black;
+  min-height: 50px;
+  background-color: beige;
+  padding: 10px;
 }
+
+/* .container-fluid {
+ 
+} */
+
+.admin-address {
+  padding-top: 10px;
+}
+
 fieldset {
-  display: block;
-  -webkit-margin-start: 0px;
-  -webkit-margin-end: 0px;
-  -webkit-padding-before: 0em;
-  -webkit-padding-start: 0em;
-  -webkit-padding-end: 0em;
-  -webkit-padding-after: 0em;
-  border: 0px;
-  border-image-source: initial;
-  border-image-slice: initial;
-  border-image-width: initial;
-  border-image-outset: initial;
-  border-image-repeat: initial;
-  min-width: -webkit-min-content;
-  padding: 30px;
+  width: 500px;
+  margin: auto;
+  padding-top: 50px;
 }
-.ghost-input, p {
-  display: block;
-  font-weight:300;
-  width: 100%;
-  font-size: 25px;
-  border:0px;
-  outline: none;
-  width: 100%;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  color: #4b545f;
-  background: #fff;
-  font-family: Open Sans,Verdana;
-  padding: 10px 15px;
-  margin: 30px 0px;
-  -webkit-transition: all 0.1s ease-in-out;
-  -moz-transition: all 0.1s ease-in-out;
-  -ms-transition: all 0.1s ease-in-out;
-  -o-transition: all 0.1s ease-in-out;
-  transition: all 0.1s ease-in-out;
+
+.contract-details {
+  margin-top: 50px;
+  margin-left: 30px;
+  background-color: aliceblue;
 }
-.ghost-input:focus {
-  border-bottom:1px solid #ddd;
+
+.election-card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  height: auto;
+  width: auto;
+  margin: 10px;
+  padding: 10px;
 }
-.ghost-button {
-  background-color: transparent;
-  border:2px solid #ddd;
-  padding:10px 30px;
-  width: 100%;
-  min-width: 350px;
-  -webkit-transition: all 0.1s ease-in-out;
-  -moz-transition: all 0.1s ease-in-out;
-  -ms-transition: all 0.1s ease-in-out;
-  -o-transition: all 0.1s ease-in-out;
-  transition: all 0.1s ease-in-out;
+
+.list-of-accounts {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  height: auto;
+  width: 250px;
+  margin: 10px;
+  padding: 10px;
+  background-color: aliceblue;
 }
-.ghost-button:hover {
-  border:2px solid #515151;
+
+.election-form {
+  margin-top: 50px;
 }
-p {
-  color: #E64A19;
+
+.form-button {
+  width: 180px;
+}
+
+.voter-dashboard {
+  padding-top: 40px;
+}
+
+.voter-card {
+  width: auto;
+  padding: 10px;
+  background-color: white;
+  border-radius: 10px;
 }
