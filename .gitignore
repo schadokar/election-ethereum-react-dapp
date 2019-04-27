@@ -1,4 +1,4 @@
-node_modules/
+node_modules
 receipt-ganache.json
-build/
+build
 .env
