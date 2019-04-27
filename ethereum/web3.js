@@ -5,7 +5,7 @@ require("dotenv").config();
 let web3;
 let web3Network;
 console.log("NODE_ENV", process.env.NODE_ENV);
-if (process.env.NODE_ENV == "GANACHE") {
+if (process.env.NODE_ENV == "GANACHE" || process.env.NODE_ENV === undefined) {
   // web3 = new Web3(ganache.provider());
 
   // local ganache-cli setup

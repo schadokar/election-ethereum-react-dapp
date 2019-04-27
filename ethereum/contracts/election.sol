@@ -7,12 +7,12 @@ contract ElectionFactory {
     event ElectionEvent(address _admin, address _electionAddress);
     
     function createElection (uint _durationInMinutes) public {
-        address newElection = new Election(_durationInMinutes);
+        address newElection = new Election(_durationInMinutes, msg.sender);
         electionConducted.push(newElection);
         emit ElectionEvent(msg.sender, newElection);
     }
     
-    function getElection() public view returns(address[] _conductedElection) {
+    function getElections() public view returns(address[] _conductedElection) {
         return electionConducted;
     }
 }
@@ -61,8 +61,8 @@ contract Election {
     mapping (bytes32 => Consituency) public consituencyData;
     mapping (bytes32 => mapping (address => uint)) public consituencyCandidateVotes;
 
-    constructor(uint _durationInMinutes) public {
-        admin = msg.sender;
+    constructor(uint _durationInMinutes, address _admin) public {
+        admin = _admin;
         electionStatus = true;
         electionDuration = now +(_durationInMinutes * 60); 
     }

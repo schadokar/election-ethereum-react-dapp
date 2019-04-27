@@ -3,31 +3,31 @@ const path = require("path");
 const solc = require("solc");
 
 const compile = () => {
-    try {
-        const buildPath = path.resolve(__dirname,"./build");
+  try {
+    const buildPath = path.resolve(__dirname, "./build");
     fs.removeSync(buildPath);
 
-    const contractPath = path.resolve(__dirname,"./contracts","Election.sol");
+    const contractPath = path.resolve(__dirname, "./contracts", "Election.sol");
     console.log(contractPath);
     const source = fs.readFileSync(contractPath, "utf8");
     const output = solc.compile(source, 1).contracts;
 
     fs.ensureDirSync(buildPath);
 
-    for(let contract in output) {
-        fs.outputJSONSync(
-            path.resolve(buildPath, contract.replace(":","")+".json"),
-            output[contract]
-        );
+    for (let contract in output) {
+      fs.outputJSONSync(
+        path.resolve(buildPath, contract.replace(":", "") + ".json"),
+        output[contract]
+      );
     }
 
-    return "Contract compiled successfully!"
-    } catch (error) {
-        console.error(error);
-        return error;
-    }
+    return "Contract compiled successfully!";
+  } catch (error) {
+    console.error(error);
+    return error;
+  }
 };
 
-console.log(compile());
+// console.log(compile());
 
 module.exports = compile;
