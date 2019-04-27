@@ -4,7 +4,7 @@ const logic = require("../../ethereum/logic");
 
 // create a new election
 router.post("/newElection", async function(req, res, next) {
-  console.log(req.body);
+  console.log("inside the ElectionAPI", req.body);
   const result = await logic.createElection(
     req.body.account,
     req.body.duration

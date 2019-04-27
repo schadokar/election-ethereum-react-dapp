@@ -22,8 +22,6 @@ const getFactoryObject = () => {
 
 const createElection = async (account, durationInMins) => {
   const contractObject = getFactoryObject();
-  // console.log(contractObject);
-
   const accounts = await web3.eth.getAccounts();
   const receipt = await contractObject.methods
     .createElection(durationInMins)
