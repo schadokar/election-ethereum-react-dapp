@@ -80,6 +80,10 @@ contract Election {
         consituencyList.push(consituency);
         consituencyData[_consituencyId] = consituencyList[consituencyList.length - 1];
     }
+
+    function getConsituencyList() public view returns(uint) {
+        return consituencyList.length;
+    }
     
     function addVoter(address _voterId, string _name, string _email,string _phoneNo, bytes32 _consituency, uint8 _age) 
         public onlyAdmin returns (bool exist){

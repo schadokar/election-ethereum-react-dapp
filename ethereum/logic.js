@@ -20,6 +20,10 @@ const getFactoryObject = () => {
   return contractObject;
 };
 
+const getAccounts = async () => {
+  return await web3.eth.getAccounts();
+};
+
 const createElection = async (account, durationInMins) => {
   const contractObject = getFactoryObject();
   const accounts = await web3.eth.getAccounts();
@@ -78,6 +82,26 @@ const addConsituency = async (account, address, consituency) => {
   return receipt;
 };
 
+// get all the added consituency
+const getConsituencyList = async address => {
+  const contractObject = getContractObject(address);
+  const accounts = await web3.eth.getAccounts();
+  const listLength = await contractObject.methods
+    .getConsituencyList()
+    .call({ from: accounts[0] });
+  // console.log(listLength);
+
+  let consituencyList = [];
+  for (let i = 0; i < listLength; i++) {
+    let consituency = await contractObject.methods
+      .consituencyList(i)
+      .call({ from: accounts[0] });
+    // console.log("consituency: ", i, consituency);
+    consituencyList.push(consituency.consituencyId);
+  }
+  // console.log(consituencyList);
+  return consituencyList;
+};
 const getConsituency = async (address, consituencyId) => {
   const contractObject = getContractObject(address);
   const accounts = await web3.eth.getAccounts();
@@ -104,7 +128,7 @@ const addVoter = async (
     .addVoter(accounts[voterId], name, email, phoneNo, consituency, age)
     .send({ from: accounts[account], gas: 3000000 });
   console.info(receipt);
-  console.info("Voter added in the consituency successfully!");
+  console.info("Voter successfully added in the consituency !");
   return receipt;
 };
 
@@ -127,14 +151,19 @@ const addCandidate = async (
   phoneNo,
   consituency
 ) => {
-  const contractObject = getContractObject(address);
-  const accounts = await web3.eth.getAccounts();
-  const receipt = await contractObject.methods
-    .addCandidate(accounts[candidateId], name, email, phoneNo, consituency)
-    .send({ from: accounts[account], gas: 1000000 });
-  console.info(receipt);
-  console.info("Candidate added in the consituency successfully!");
-  return receipt;
+  try {
+    const contractObject = getContractObject(address);
+    const accounts = await web3.eth.getAccounts();
+    const receipt = await contractObject.methods
+      .addCandidate(accounts[candidateId], name, email, phoneNo, consituency)
+      .send({ from: accounts[account], gas: 1000000 });
+    console.info(receipt);
+    console.info("Candidate successfully added in the consituency!");
+    return receipt;
+  } catch (error) {
+    console.error("logic.js: add candidate", error);
+    return error;
+  }
 };
 
 const getCandidate = async (address, candidateId) => {
@@ -191,11 +220,13 @@ const winnerOfElection = async (address, account) => {
 };
 
 module.exports = {
+  getAccounts,
   createElection,
   getConductedElections,
   getElectionAddress,
   getElectionAdmin,
   addConsituency,
+  getConsituencyList,
   getConsituency,
   addVoter,
   getVoter,

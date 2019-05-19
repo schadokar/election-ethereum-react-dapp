@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Divider, Form, Button, Message } from "semantic-ui-react";
+import { Divider, Form, Button, Message, Card, Input } from "semantic-ui-react";
 import axios from "axios";
 
 const endpoint = "http://localhost:4000";
@@ -11,7 +11,10 @@ class CreateElection extends Component {
     this.state = {
       accountIndex: 0,
       duration: "",
-      message: "Create new Election"
+      message: "Create new Election",
+      electionList: [],
+      items: [],
+      loading: false
     };
 
     this.onChange = this.onChange.bind(this);
@@ -23,28 +26,59 @@ class CreateElection extends Component {
   }
 
   onSubmit(event) {
-    axios
-      .post(endpoint + "/api/v1/newElection", {
-        account: this.state.accountIndex,
-        duration: parseInt(this.state.duration)
-      })
-      .then(res => {
-        console.log("------------", res);
-        this.setState({
-          message: `Transaction Hash: ${res.data.transactionHash}`
+    this.setState({ loading: true });
+
+    try {
+      axios
+        .post(endpoint + "/api/v1/newElection", {
+          account: this.state.accountIndex,
+          duration: parseInt(this.state.duration)
+        })
+        .then(res => {
+          console.log("------------", res);
+          this.setState({
+            message: `Transaction Hash: ${res.data.transactionHash}`
+          });
+          this.getElectionList();
+        })
+        .catch(err => {
+          console.error(err);
         });
-      })
-      .catch(err => {
-        console.error(err);
+    } catch (error) {
+      console.log(error);
+    }
+    this.setState({ loading: false });
+  }
+
+  componentDidMount() {
+    this.getElectionList();
+  }
+
+  getElectionList() {
+    axios.get(endpoint + "/api/v1/getElections").then(res => {
+      console.log(res);
+      this.setState({
+        electionList: res.data,
+        items: res.data.map(address => {
+          let card = {
+            header: address,
+            description: <a href={`/Election/${address}`}>View Election</a>,
+            fluid: true
+          };
+          return card;
+        })
       });
+    });
   }
 
   render() {
     return (
       <div>
-        <Form>
+        <Form onSubmit={this.onSubmit}>
           <Form.Field>
-            <input
+            <Input
+              label="minutes"
+              labelPosition="right"
               type="text"
               name="duration"
               value={this.state.duration}
@@ -52,12 +86,13 @@ class CreateElection extends Component {
               placeholder="Duration of Election in minutes"
             />
           </Form.Field>
-          <Button primary type="submit" onClick={this.onSubmit}>
+          <Button loading={this.state.loading} primary>
             Create
           </Button>
           <Message info>{this.state.message}</Message>
         </Form>
-        <Divider horizontal />
+        <Divider horizontal>Elections</Divider>
+        <Card.Group items={this.state.items} />
       </div>
     );
   }

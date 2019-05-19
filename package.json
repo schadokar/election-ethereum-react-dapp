@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js",
-    "dev": "set NODE_ENV=GANACHE&& nodemon ./server/index.js",
+    "dev": "set NODE_ENV=GANACHE&& node ./server/index.js",
     "ganacheDeploy": "set NODE_ENV=GANACHE&& node ./ethereum/deploy"
   },
   "author": "",

@@ -2,6 +2,14 @@ const express = require("express");
 const router = express.Router();
 const logic = require("../../ethereum/logic");
 
+// get available accounts
+router.get("/accounts", async (req, res, next) => {
+  console.log("Inside the accounts");
+  const result = await logic.getAccounts();
+  res.send(result);
+  res.end("Accounts fetched!");
+});
+
 // create a new election
 router.post("/newElection", async function(req, res, next) {
   console.log("inside the ElectionAPI", req.body);
@@ -21,15 +29,15 @@ router.get("/getElections", async function(req, res, next) {
   res.end("List of conducted elections!");
 });
 
-// get all conducted election list
+// get a conducted election on index
 router.get("/getElections/:index", async function(req, res, next) {
   console.log(req.params);
   const result = await logic.getElectionAddress(parseInt(req.params.index));
   res.send(result);
-  res.end("List of conducted elections!");
+  res.end("conducted election!");
 });
 
-// get all conducted election list
+// get admin of conducted election at address
 router.get("/getElectionAdmin/:address", async function(req, res, next) {
   const result = await logic.getElectionAdmin(req.params.address);
   res.send(result);
@@ -46,6 +54,12 @@ router.post("/addConsituency/:address", async function(req, res, next) {
   res.end("Success");
 });
 
+// get consituency list from Consituency list
+router.get("/getConsituencyList/:address", async function(req, res, next) {
+  const result = await logic.getConsituencyList(req.params.address);
+  res.send(result);
+});
+
 // get consituency data from Consituency list
 router.get("/getConsituency/:address", async function(req, res, next) {
   const result = await logic.getConsituency(
@@ -58,8 +72,16 @@ router.get("/getConsituency/:address", async function(req, res, next) {
 // add voter to voter list
 router.post("/addVoter/:address", async function(req, res, next) {
   console.log(req.body);
-
   const { account, voterId, name, email, phoneNo, consituency, age } = req.body;
+  console.log(
+    typeof account,
+    typeof voterId,
+    typeof name,
+    typeof email,
+    typeof phoneNo,
+    typeof consituency,
+    typeof age
+  );
   const result = await logic.addVoter(
     req.params.address,
     account,
@@ -82,19 +104,31 @@ router.get("/getVoter/:address", async function(req, res, next) {
 
 // add candidate to election candidate list
 router.post("/addCandidate/:address", async function(req, res, next) {
-  console.log(req.body);
-  const { account, candidateId, name, email, phoneNo, consituency } = req.body;
-  const result = await logic.addCandidate(
-    req.params.address,
-    account,
-    candidateId,
-    name,
-    email,
-    phoneNo,
-    consituency
-  );
-  res.send(result);
-  res.end("Success");
+  try {
+    console.log(req.body);
+    const {
+      account,
+      candidateId,
+      name,
+      email,
+      phoneNo,
+      consituency
+    } = req.body;
+    const result = await logic.addCandidate(
+      req.params.address,
+      account,
+      candidateId,
+      name,
+      email,
+      phoneNo,
+      consituency
+    );
+    res.send(result);
+    res.end("Success");
+  } catch (error) {
+    console.error("electionAPI: addcandidate", error);
+    res.send(error);
+  }
 });
 
 // get candidate data from candidate list
