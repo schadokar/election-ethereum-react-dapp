@@ -1,24 +1,20 @@
 import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
-import { Select, Form, Button, Menu, Message } from "semantic-ui-react";
+import { Menu, Message } from "semantic-ui-react";
 import axios from "axios";
 const endpoint = "http://localhost:4000";
 
-class Election extends Component {
+class ElectionHeader extends Component {
   constructor(props) {
     super(props);
     this.state = {
       activeItem: "",
-      admin: "adin",
-      contractAddress: "0x5ee338554BFc41eb3127196D47a5eEa85FD3db08",
+      admin: "",
+      contractAddress: "",
       account: "",
       consituency: "",
       message: "",
       voterRoute: ""
     };
-
-    this.onChange = this.onChange.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
   }
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name });
@@ -29,27 +25,17 @@ class Election extends Component {
     await this.setState({
       contractAddress: url.split("/")[url.split("/").length - 1]
     });
-  }
 
-  onChange(event) {
-    this.setState({
-      [event.target.name]: event.target.value
-    });
-  }
+    // get the admin of the election
 
-  onSubmit() {
     axios
-      .post(endpoint + "/api/v1/addConsituency/" + this.state.contractAddress, {
-        account: 0,
-        consituency: this.state.consituency
-      })
+      .get(endpoint + "/api/v1/getElectionAdmin/" + this.state.contractAddress)
       .then(res => {
         console.log(res);
-        this.setState({
-          message: res.data.transactionHash
-        });
+        this.setState({ admin: res.data });
       });
   }
+
   render() {
     return (
       <div>
@@ -90,32 +76,9 @@ class Election extends Component {
           <Message.Header>admin: {this.state.admin}</Message.Header>
           <p>contract address: {this.state.contractAddress}</p>
         </Message>
-        {/* <Select placeholder="Select an account" options={accounts} /> */}
-
-        <Form>
-          <Form.Field>
-            <label>Add Consituency</label>
-            <input
-              placeholder="Create Consituency"
-              type="text"
-              name="consituency"
-              onChange={this.onChange}
-              value={this.state.consituency}
-            />
-          </Form.Field>
-          <Button primary type="submit" onClick={this.onSubmit}>
-            Add Consituency
-          </Button>
-        </Form>
-
-        <Message info>
-          <Message.Header>
-            <p>{this.state.message}</p>
-          </Message.Header>
-        </Message>
       </div>
     );
   }
 }
 
-export default Election;
+export default ElectionHeader;

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Form, Button, Dropdown, Message } from "semantic-ui-react";
 import axios from "axios";
+import ElectionHeader from "../layout/Election-Header";
 
 const endpoint = "http://localhost:4000";
 
@@ -11,7 +12,7 @@ class RegisterCandidate extends Component {
       admin: 0,
       accounts: [],
       consituencyList: [],
-      contractAddress: "0x5ee338554BFc41eb3127196D47a5eEa85FD3db08",
+      contractAddress: "",
       candidateAddress: 0,
       candidateName: "shubham",
       candidateEmail: "email",
@@ -25,7 +26,13 @@ class RegisterCandidate extends Component {
     // this.handleChange = this.handleChange.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    // set the contract address from the url
+    const url = window.location.href;
+    await this.setState({
+      contractAddress: url.split("/")[url.split("/").length - 1]
+    });
+
     // get the ethereum accounts
     axios.get(endpoint + "/api/v1/accounts").then(res => {
       // console.log(res);
@@ -76,7 +83,7 @@ class RegisterCandidate extends Component {
         consituency: this.state.candidateConsituency
       })
       .then(res => {
-        console.log(res);
+        // console.log(res);
         this.setState({
           message: res.data.transactionHash
         });
@@ -88,13 +95,14 @@ class RegisterCandidate extends Component {
     this.setState({
       [name]: value
     });
-    console.log(e, result);
+
     console.log(result.value, result.name);
   };
 
   render() {
     return (
       <div>
+        <ElectionHeader />
         <Form>
           <Form.Field>
             <label>Admin</label>
