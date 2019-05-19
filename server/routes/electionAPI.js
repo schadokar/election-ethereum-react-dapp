@@ -46,7 +46,7 @@ router.get("/getElectionAdmin/:address", async function(req, res, next) {
 
 // add Consituency to Consituency list
 router.post("/addConsituency/:address", async function(req, res, next) {
-  console.log(req.body);
+  console.log(req.body, req.params.address);
   const address = req.params.address;
   const { account, consituency } = req.body;
   const result = await logic.addConsituency(account, address, consituency);

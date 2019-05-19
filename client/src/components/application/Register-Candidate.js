@@ -104,20 +104,21 @@ class RegisterCandidate extends Component {
       <div>
         <ElectionHeader />
         <Form>
-          <Form.Field>
-            <label>Admin</label>
-            <input
-              placeholder="Admin address"
-              type="text"
-              name="admin"
-              onChange={this.onChange}
-              value={this.state.admin}
-            />
-          </Form.Field>
           <Form.Field
-            placeholder="Add Candidate"
+            placeholder="Admin Id"
+            name="admin"
+            label="Admin Id"
+            control={Dropdown}
+            fluid
+            selection
+            onChange={this.handleChange}
+            options={this.state.accounts}
+            value={this.state.admin}
+          />
+          <Form.Field
+            placeholder="Candidate Id"
             name="candidateAddress"
-            label="Add Candidate"
+            label="Candidate Id"
             control={Dropdown}
             fluid
             selection

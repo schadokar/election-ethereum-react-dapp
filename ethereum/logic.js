@@ -75,10 +75,11 @@ const addConsituency = async (account, address, consituency) => {
   const contractObject = getContractObject(address);
   console.info(`Sending transaction from account ${accounts[account]}`);
   const receipt = await contractObject.methods
-    .addConsituency(consituency)
+    .addConsituency(web3.utils.fromAscii(consituency))
     .send({ from: accounts[account], gas: 1000000 });
   console.info(receipt);
   console.info("Consituency successfully added!");
+  //  console.info(web3.utils.fromAscii(consituency));
   return receipt;
 };
 
@@ -96,8 +97,10 @@ const getConsituencyList = async address => {
     let consituency = await contractObject.methods
       .consituencyList(i)
       .call({ from: accounts[0] });
-    // console.log("consituency: ", i, consituency);
-    consituencyList.push(consituency.consituencyId);
+    //console.log("consituency: ", consituency.consituencyId.split("0000", 1));
+    consituencyList.push(
+      web3.utils.toAscii(consituency.consituencyId.split("0000", 1)[0])
+    );
   }
   // console.log(consituencyList);
   return consituencyList;

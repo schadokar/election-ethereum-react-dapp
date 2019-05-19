@@ -118,9 +118,9 @@ class RegisterVoter extends Component {
             />
           </Form.Field>
           <Form.Field
-            placeholder="Add Voter"
+            placeholder="Voter ID"
             name="voterAddress"
-            label="Add Voter"
+            label="Voter ID"
             control={Dropdown}
             fluid
             selection

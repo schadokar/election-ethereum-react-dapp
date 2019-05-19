@@ -40,7 +40,12 @@ class ElectionHeader extends Component {
     return (
       <div>
         <Menu>
-          <Menu.Item header>
+          <Menu.Item
+            header
+            href={`http://localhost:3000/Election/${
+              this.state.contractAddress
+            }`}
+          >
             <h3>Election</h3>
           </Menu.Item>
           <Menu.Item

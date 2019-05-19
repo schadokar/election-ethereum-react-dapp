@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
-import { Select, Form, Button, Menu, Message } from "semantic-ui-react";
+import { Form, Button, Menu, Message } from "semantic-ui-react";
 import axios from "axios";
+import ElectionHeader from "../layout/Election-Header";
+
 const endpoint = "http://localhost:4000";
 
 class Election extends Component {
@@ -9,19 +10,15 @@ class Election extends Component {
     super(props);
     this.state = {
       activeItem: "",
-      admin: "adin",
-      contractAddress: "0x5ee338554BFc41eb3127196D47a5eEa85FD3db08",
+      contractAddress: "",
       account: "",
       consituency: "",
-      message: "",
-      voterRoute: ""
+      message: ""
     };
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
-
-  handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
   async componentDidMount() {
     // set the contract address from the url
@@ -29,7 +26,9 @@ class Election extends Component {
     await this.setState({
       contractAddress: url.split("/")[url.split("/").length - 1]
     });
+    // console.log(url.split("/")[url.split("/").length - 1]);
   }
+  handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
   onChange(event) {
     this.setState({
@@ -53,45 +52,7 @@ class Election extends Component {
   render() {
     return (
       <div>
-        <Menu>
-          <Menu.Item header>
-            <h3>Election</h3>
-          </Menu.Item>
-          <Menu.Item
-            position="right"
-            name="Vote"
-            active={this.state.activeItem === "Vote"}
-            onClick={this.handleItemClick}
-          />
-          <Menu.Item
-            // position="right"
-            name="Result"
-            active={this.state.activeItem === "Result"}
-            onClick={this.routeChange}
-          />
-          <Menu.Item
-            href={`http://localhost:3000/voterRegistration/${
-              this.state.contractAddress
-            }`}
-            name="RegisterVoter"
-            active={this.state.activeItem === "RegisterVoter"}
-            onClick={this.handleItemClick}
-          />
-          <Menu.Item
-            href={`http://localhost:3000/candidateRegistration/${
-              this.state.contractAddress
-            }`}
-            name="RegisterCandidate"
-            active={this.state.activeItem === "RegisterCandidate"}
-            onClick={this.handleItemClick}
-          />
-        </Menu>
-        <Message info>
-          <Message.Header>admin: {this.state.admin}</Message.Header>
-          <p>contract address: {this.state.contractAddress}</p>
-        </Message>
-        {/* <Select placeholder="Select an account" options={accounts} /> */}
-
+        <ElectionHeader />
         <Form>
           <Form.Field>
             <label>Add Consituency</label>
