@@ -73,15 +73,15 @@ router.get("/getConsituency/:address", async function(req, res, next) {
 router.post("/addVoter/:address", async function(req, res, next) {
   console.log(req.body);
   const { account, voterId, name, email, phoneNo, consituency, age } = req.body;
-  console.log(
-    typeof account,
-    typeof voterId,
-    typeof name,
-    typeof email,
-    typeof phoneNo,
-    typeof consituency,
-    typeof age
-  );
+  // console.log(
+  //   typeof account,
+  //   typeof voterId,
+  //   typeof name,
+  //   typeof email,
+  //   typeof phoneNo,
+  //   typeof consituency,
+  //   typeof age
+  // );
   const result = await logic.addVoter(
     req.params.address,
     account,
@@ -94,6 +94,12 @@ router.post("/addVoter/:address", async function(req, res, next) {
   );
   res.send(result);
   res.end("Success");
+});
+
+// get voter list from Voter List
+router.get("/getVoterList/:address", async function(req, res, next) {
+  const result = await logic.getVoterList(req.params.address);
+  res.send(result);
 });
 
 // get voter data from voter list
@@ -131,6 +137,12 @@ router.post("/addCandidate/:address", async function(req, res, next) {
   }
 });
 
+// get candidate list from candidate List
+router.get("/getCandidateList/:address", async function(req, res, next) {
+  const result = await logic.getCandidateList(req.params.address);
+  res.send(result);
+});
+
 // get candidate data from candidate list
 router.get("/getCandidate/:address", async function(req, res, next) {
   const result = await logic.getCandidate(
@@ -144,7 +156,7 @@ router.get("/getCandidate/:address", async function(req, res, next) {
 router.post("/castVote/:address", async function(req, res, next) {
   const result = await logic.castVote(
     req.params.address,
-    req.body.account,
+    req.body.voterId,
     req.body.candidateId
   );
   console.log(result);
@@ -171,11 +183,8 @@ router.post("/closeElection/:address", async (req, res, next) => {
 });
 
 // get the winner of the election
-router.get("/electionWinner/:address", async (req, res, next) => {
-  const result = await logic.winnerOfElection(
-    req.params.address,
-    req.body.account
-  );
+router.post("/electionWinner/:address", async (req, res, next) => {
+  const result = await logic.winnerOfElection(req.params.address);
   res.send(result);
 });
 module.exports = router;

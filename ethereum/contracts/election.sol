@@ -44,7 +44,7 @@ contract Election {
     
     struct Consituency {
         bytes32 consituencyId;
-        address[] candidateCount;
+        uint8 candidateCount;
         uint8 voterCount;
     }
 
@@ -59,6 +59,7 @@ contract Election {
     Consituency[] public consituencyList;
     mapping (bytes32 => bool) public consituencyExist;
     mapping (bytes32 => Consituency) public consituencyData;
+    mapping (bytes32 => address[]) public consituencyCandidates;
     mapping (bytes32 => mapping (address => uint)) public consituencyCandidateVotes;
 
     constructor(uint _durationInMinutes, address _admin) public {
@@ -76,12 +77,12 @@ contract Election {
         require(!consituencyExist[_consituencyId], "consituency already exist");
         consituencyExist[_consituencyId] = true;
         
-        Consituency memory consituency = Consituency(_consituencyId, new address[](0), 0);
+        Consituency memory consituency = Consituency(_consituencyId, 0, 0);
         consituencyList.push(consituency);
         consituencyData[_consituencyId] = consituencyList[consituencyList.length - 1];
     }
 
-    function getConsituencyList() public view returns(uint) {
+    function getConsituencyListLength() public view returns(uint) {
         return consituencyList.length;
     }
     
@@ -113,6 +114,10 @@ contract Election {
         }
     }
 
+    function getVotersListLength() public view returns(uint) {
+        return votersList.length;
+    }
+
     function addCandidate(address _candidateId, string _name, string _email, string _phoneNo, bytes32 _consituency) public onlyAdmin returns(bool exist) {
         // check if admin is registering himself as candidate
         require(admin != _candidateId, "Admin can't be a candidate");
@@ -132,7 +137,7 @@ contract Election {
             candidateExist[_candidateId] = true;
             candidateData[_candidateId] = candidateList[candidateList.length - 1];
             // map Candidate to its consituency
-            consituencyData[_consituency].candidateCount.push(_candidateId); 
+            consituencyData[_consituency].candidateCount += 1;
             consituencyCandidateVotes[_consituency][_candidateId] = 0; 
             return true;
         }
@@ -141,7 +146,11 @@ contract Election {
         }
     }
 
-     function castVote(address _candidateId) public {
+    function getCandidatesListLength() public view returns(uint) {
+        return candidateList.length;
+    }
+
+    function castVote(address _candidateId) public {
         //election must be active
         require(electionStatus, "Election must be on/active");
 
@@ -164,22 +173,22 @@ contract Election {
         electionStatus = false;
     }
 
-    function winnerOfElection() public view onlyAdmin returns(address[] _winners) {
-        require(!electionStatus, "Election is active");
-        address[] memory winners = new address[](consituencyList.length - 1);
-         for(uint i =0; i< consituencyList.length; i++) {
-            uint maxVoteCandidate = 0;
-            address candidate;
-            Consituency memory consituency = consituencyList[i];
-            for(uint j = 0; j < consituency.candidateCount.length ; j++) {
-                uint votes = consituencyCandidateVotes[consituency.consituencyId][consituency.candidateCount[j]];
-                if(maxVoteCandidate < votes) {
-                    maxVoteCandidate = votes;
-                    candidate = consituency.candidateCount[j];
-                }
-            }
-            winners[i]= candidate;
-        }
-        return winners;
-    }
+    // function winnerOfElection() public view onlyAdmin returns(address[] _winners) {
+    //     require(!electionStatus, "Election is active");
+    //     address[] memory winners = new address[](consituencyList.length - 1);
+    //      for(uint i =0; i< consituencyList.length; i++) {
+    //         uint maxVoteCandidate = 0;
+    //         address candidate;
+    //         Consituency memory consituency = consituencyList[i];
+    //         for(uint j = 0; j < consituency.candidateCount.length ; j++) {
+    //             uint votes = consituencyCandidateVotes[consituency.consituencyId][consituency.candidateCount[j]];
+    //             if(maxVoteCandidate < votes) {
+    //                 maxVoteCandidate = votes;
+    //                 candidate = consituency.candidateCount[j];
+    //             }
+    //         }
+    //         winners[i]= candidate;
+    //     }
+    //     return winners;
+    // }
 }

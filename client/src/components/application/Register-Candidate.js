@@ -13,7 +13,7 @@ class RegisterCandidate extends Component {
       accounts: [],
       consituencyList: [],
       contractAddress: "",
-      candidateAddress: 0,
+      candidateAddress: 2,
       candidateName: "shubham",
       candidateEmail: "email",
       candidatePhone: "0999778",

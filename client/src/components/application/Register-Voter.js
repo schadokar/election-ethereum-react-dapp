@@ -108,7 +108,7 @@ class RegisterVoter extends Component {
         <ElectionHeader />
         <Form>
           <Form.Field>
-            <label>Admin</label>
+            <label>Admin ID</label>
             <input
               placeholder="Admin address"
               type="text"

@@ -49,13 +49,15 @@ class ElectionHeader extends Component {
             <h3>Election</h3>
           </Menu.Item>
           <Menu.Item
-            position="right"
+            //  position="right"
+            href={`http://localhost:3000/vote/${this.state.contractAddress}`}
             name="Vote"
             active={this.state.activeItem === "Vote"}
             onClick={this.handleItemClick}
           />
           <Menu.Item
             // position="right"
+            href={`http://localhost:3000/result/${this.state.contractAddress}`}
             name="Result"
             active={this.state.activeItem === "Result"}
             onClick={this.routeChange}
