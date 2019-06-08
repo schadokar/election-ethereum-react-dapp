@@ -11,6 +11,7 @@ class CreateElection extends Component {
     this.state = {
       accountIndex: 0,
       duration: "",
+      electionName: "",
       message: "Create new Election",
       electionList: [],
       items: [],
@@ -32,7 +33,8 @@ class CreateElection extends Component {
       axios
         .post(endpoint + "/api/v1/newElection", {
           account: this.state.accountIndex,
-          duration: parseInt(this.state.duration)
+          duration: parseInt(this.state.duration),
+          electionName: this.state.electionName
         })
         .then(res => {
           console.log("------------", res);
@@ -56,13 +58,19 @@ class CreateElection extends Component {
 
   getElectionList() {
     axios.get(endpoint + "/api/v1/getElections").then(res => {
-      console.log(res);
+      console.log(res.data);
       this.setState({
         electionList: res.data,
-        items: res.data.map(address => {
+        items: res.data.reverse().map(election => {
+          console.log("--->", election);
           let card = {
-            header: address,
-            description: <a href={`/Election/${address}`}>View Election</a>,
+            header: election.electionName,
+            description: (
+              <a href={`/Election/${election.electionAddress}`}>
+                View Election
+              </a>
+            ),
+            meta: `Election Address: ${election.electionAddress}`,
             fluid: true
           };
           return card;
@@ -84,6 +92,15 @@ class CreateElection extends Component {
               value={this.state.duration}
               onChange={this.onChange}
               placeholder="Duration of Election in minutes"
+            />
+          </Form.Field>
+          <Form.Field>
+            <Input
+              type="text"
+              name="electionName"
+              value={this.state.electionName}
+              onChange={this.onChange}
+              placeholder="Election Name"
             />
           </Form.Field>
           <Button loading={this.state.loading} primary>

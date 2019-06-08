@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Form, Dropdown, Button, Message } from "semantic-ui-react";
 import axios from "axios";
 import ElectionHeader from "../layout/Election-Header";
+import Result from "./Result";
 
 const endpoint = "http://localhost:4000";
 
@@ -14,6 +15,7 @@ class Vote extends Component {
       candidateList: [],
       voter: "",
       candidate: "",
+      consituencyId: 4,
       message: ""
     };
     this.handleChange = this.handleChange.bind(this);
@@ -32,48 +34,74 @@ class Vote extends Component {
       .get(endpoint + "/api/v1/getVoterList/" + this.state.contractAddress)
       .then(res => {
         let arr = res.data;
+        console.log(res.data);
         this.setState({
           voterList: arr.map(arr => ({
-            key: arr,
-            text: arr,
-            value: arr
-          }))
-        });
-      });
-
-    // fetch all candidates
-    axios
-      .get(endpoint + "/api/v1/getCandidateList/" + this.state.contractAddress)
-      .then(res => {
-        let arr = res.data;
-        this.setState({
-          candidateList: arr.map(arr => ({
-            key: arr,
-            text: arr,
-            value: arr
+            key: arr.voterId,
+            text: arr.name,
+            value: arr.voterId
           }))
         });
       });
   }
 
-  handleChange(e, result) {
+  async handleChange(e, result) {
     const { name, value } = result;
     this.setState({
       [name]: value
     });
     console.log(result.value, result.name);
+    if (result.name == "voter") {
+      await axios
+        .get(
+          endpoint +
+            "/api/v1/getVoterConsituencyCandidates/" +
+            this.state.contractAddress,
+          {
+            params: {
+              account: result.value
+            }
+          }
+        )
+        .then(async res => {
+          console.log("res", res);
+          let candidateList = res.data.candidateList.map(candidateId =>
+            axios
+              .get(
+                endpoint + "/api/v1/getCandidate/" + this.state.contractAddress,
+                {
+                  params: { candidateId: candidateId }
+                }
+              )
+              .then(res => {
+                return res.data;
+              })
+          );
+          candidateList = await Promise.all(candidateList);
+          this.setState({
+            candidateList: candidateList.map(candidate => ({
+              key: candidate.candidateId,
+              text: candidate.name,
+              value: candidate.candidateId
+            }))
+          });
+        });
+    }
   }
 
   onSubmit() {
     axios
       .post(endpoint + "/api/v1/castVote/" + this.state.contractAddress, {
         voterId: this.state.voter,
+        consituencyId: this.state.consituencyId,
         candidateId: this.state.candidate
       })
       .then(res => {
         console.log(res);
         this.setState({
-          message: res.data.transactionHash
+          message: `Vote casted Successfully!\n TxHash: ${
+            res.data.transactionHash
+          }`
         });
       });
   }

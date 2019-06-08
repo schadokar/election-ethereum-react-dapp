@@ -9,14 +9,14 @@ class RegisterCandidate extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      admin: 0,
+      admin: "",
       accounts: [],
       consituencyList: [],
       contractAddress: "",
       candidateAddress: 2,
-      candidateName: "shubham",
-      candidateEmail: "email",
-      candidatePhone: "0999778",
+      candidateName: "",
+      candidateEmail: "",
+      candidatePhone: "",
       candidateConsituency: "Select Consituency",
       message: "",
       value: ""
@@ -42,7 +42,7 @@ class RegisterCandidate extends Component {
         accounts: arr.map((arr, index) => ({
           key: index,
           text: arr,
-          value: index
+          value: arr
         }))
       });
       console.log(this.state.accounts);
@@ -58,9 +58,9 @@ class RegisterCandidate extends Component {
         let arr = res.data;
         this.setState({
           consituencyList: arr.map(arr => ({
-            key: arr,
-            text: arr,
-            value: arr
+            key: arr.consituencyId,
+            text: arr.name,
+            value: arr.consituencyId
           }))
         });
       });
@@ -75,7 +75,7 @@ class RegisterCandidate extends Component {
   onSubmit() {
     axios
       .post(endpoint + "/api/v1/addCandidate/" + this.state.contractAddress, {
-        account: 0,
+        account: this.state.admin,
         candidateId: this.state.candidateAddress,
         name: this.state.candidateName,
         email: this.state.candidateEmail,

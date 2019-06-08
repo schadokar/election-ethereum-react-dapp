@@ -10,6 +10,7 @@ class ElectionHeader extends Component {
       activeItem: "",
       admin: "",
       contractAddress: "",
+      contractName: "",
       account: "",
       consituency: "",
       message: "",
@@ -33,6 +34,13 @@ class ElectionHeader extends Component {
       .then(res => {
         console.log(res);
         this.setState({ admin: res.data });
+      });
+
+    axios
+      .get(endpoint + "/api/v1/getElectionName/" + this.state.contractAddress)
+      .then(res => {
+        console.log(res);
+        this.setState({ contractName: res.data });
       });
   }
 
@@ -62,6 +70,21 @@ class ElectionHeader extends Component {
             active={this.state.activeItem === "Result"}
             onClick={this.routeChange}
           />
+
+          <Menu.Item
+            href={`http://localhost:3000/candidates/${
+              this.state.contractAddress
+            }`}
+            name="Candidates"
+            active={this.state.activeItem === "Candidates"}
+            onClick={this.handleItemClick}
+          />
+          <Menu.Item
+            href={`http://localhost:3000/voters/${this.state.contractAddress}`}
+            name="Voters"
+            active={this.state.activeItem === "Voters"}
+            onClick={this.handleItemClick}
+          />
           <Menu.Item
             href={`http://localhost:3000/voterRegistration/${
               this.state.contractAddress
@@ -80,8 +103,9 @@ class ElectionHeader extends Component {
           />
         </Menu>
         <Message info>
-          <Message.Header>admin: {this.state.admin}</Message.Header>
-          <p>contract address: {this.state.contractAddress}</p>
+          <Message.Header>Election: {this.state.contractName}</Message.Header>
+          <p>Admin: {this.state.admin}</p>
+          <p>Contract Address: {this.state.contractAddress}</p>
         </Message>
       </div>
     );

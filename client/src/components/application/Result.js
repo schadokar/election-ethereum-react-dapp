@@ -11,7 +11,9 @@ class Result extends Component {
     this.state = {
       contractAddress: "",
       admin: "",
-      message: ""
+      message: "",
+      candidateId: "",
+      votes: 0
     };
 
     this.closeElection = this.closeElection.bind(this);
@@ -54,13 +56,15 @@ class Result extends Component {
       endpoint + "/api/v1/electionWinner/" + this.state.contractAddress
     );
     axios
-      .post(endpoint + "/api/v1/electionWinner/" + this.state.contractAddress, {
-        account: this.state.admin
-      })
+      .post(endpoint + "/api/v1/electionWinner/" + this.state.contractAddress)
       .then(res => {
-        console.log(res);
+        console.log(Object.keys(res.data), Object.values(res.data));
         this.setState({
-          message: res.data.transactionHash
+          message: `Winner of the election is ${
+            Object.values(res.data)[0].candidateId
+          } total votes: ${Object.values(res.data)[0].votes}`,
+          candidateId: res.data.candidateId,
+          votes: res.data.votes
         });
       });
   }
@@ -76,7 +80,7 @@ class Result extends Component {
           Election Result
         </Button>
         <Message info>
-          <Message.Header>Winner of the Election</Message.Header>
+          <Message.Header>Result</Message.Header>
           <p>{this.state.message}</p>
         </Message>
       </div>

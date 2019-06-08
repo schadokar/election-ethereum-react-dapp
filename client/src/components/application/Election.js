@@ -12,7 +12,8 @@ class Election extends Component {
       activeItem: "",
       contractAddress: "",
       account: "",
-      consituency: "",
+      consituencyId: "",
+      consituencyName: "",
       message: ""
     };
 
@@ -40,7 +41,8 @@ class Election extends Component {
     axios
       .post(endpoint + "/api/v1/addConsituency/" + this.state.contractAddress, {
         account: 0,
-        consituency: this.state.consituency
+        consituencyId: this.state.consituencyId,
+        consituencyName: this.state.consituencyName
       })
       .then(res => {
         console.log(res);
@@ -57,11 +59,21 @@ class Election extends Component {
           <Form.Field>
             <label>Add Consituency</label>
             <input
-              placeholder="Create Consituency"
+              placeholder="Consituency ID"
               type="text"
-              name="consituency"
+              name="consituencyId"
               onChange={this.onChange}
-              value={this.state.consituency}
+              value={this.state.consituencyId}
+            />
+          </Form.Field>
+          <Form.Field>
+            <label>Consituency Name</label>
+            <input
+              placeholder="Consituency Name"
+              type="text"
+              name="consituencyName"
+              onChange={this.onChange}
+              value={this.state.consituencyName}
             />
           </Form.Field>
           <Button primary type="submit" onClick={this.onSubmit}>

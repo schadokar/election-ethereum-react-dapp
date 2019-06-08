@@ -9,16 +9,16 @@ class RegisterVoter extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      admin: 0,
+      admin: "",
       accounts: [],
       consituencyList: [],
       contractAddress: "",
-      voterAddress: 1,
-      voterName: "voter1",
-      voterEmail: "email",
-      voterPhone: "09000",
+      voterAddress: "",
+      voterName: "",
+      voterEmail: "",
+      voterPhone: "",
       voterConsituency: "Select Consituency",
-      voterAge: "19",
+      voterAge: "",
       message: "",
       value: ""
     };
@@ -44,10 +44,10 @@ class RegisterVoter extends Component {
         accounts: arr.map((arr, index) => ({
           key: index,
           text: arr,
-          value: index
+          value: arr
         }))
       });
-      console.log(this.state.accounts);
+      // console.log(this.state.accounts);
     });
 
     // get the available consituency List
@@ -56,13 +56,13 @@ class RegisterVoter extends Component {
         endpoint + "/api/v1/getConsituencyList/" + this.state.contractAddress
       )
       .then(res => {
-        //  console.log(res);
+        console.log(res);
         let arr = res.data;
         this.setState({
           consituencyList: arr.map(arr => ({
-            key: arr,
-            text: arr,
-            value: arr
+            key: arr.consituencyId,
+            text: arr.name,
+            value: arr.consituencyId
           }))
         });
       });
@@ -77,7 +77,7 @@ class RegisterVoter extends Component {
   onSubmit() {
     axios
       .post(endpoint + "/api/v1/addVoter/" + this.state.contractAddress, {
-        account: 0,
+        account: this.state.admin,
         voterId: this.state.voterAddress,
         name: this.state.voterName,
         email: this.state.voterEmail,
@@ -107,16 +107,17 @@ class RegisterVoter extends Component {
       <div>
         <ElectionHeader />
         <Form>
-          <Form.Field>
-            <label>Admin ID</label>
-            <input
-              placeholder="Admin address"
-              type="text"
-              name="admin"
-              onChange={this.onChange}
-              value={this.state.admin}
-            />
-          </Form.Field>
+          <Form.Field
+            placeholder="Admin Id"
+            name="admin"
+            label="Admin Id"
+            control={Dropdown}
+            fluid
+            selection
+            onChange={this.handleChange}
+            options={this.state.accounts}
+            value={this.state.admin}
+          />
           <Form.Field
             placeholder="Voter ID"
             name="voterAddress"

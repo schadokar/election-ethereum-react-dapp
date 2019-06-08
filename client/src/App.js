@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { Container } from "semantic-ui-react";
 import Header from "../src/components/layout/Header";
-import CreateElection from "../src/components/application/CreateElection";
+import CreateElection from "./components/application/Create-Election";
 import Election from "../src/components/application/Election";
+import Voters from "../src/components/application/Voters";
+import Candidates from "../src/components/application/Candidates";
 import RegisterVoter from "../src/components/application/Register-Voter";
 import RegisterCandidate from "../src/components/application/Register-Candidate";
 import Vote from "../src/components/application/Vote";
@@ -25,6 +27,8 @@ class App extends Component {
             />
             <Route path="/vote" component={Vote} />
             <Route path="/result" component={Result} />
+            <Route path="/voters" component={Voters} />
+            <Route path="/candidates" component={Candidates} />
           </Router>
         </Container>
       </div>

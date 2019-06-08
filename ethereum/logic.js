@@ -24,11 +24,11 @@ const getAccounts = async () => {
   return await web3.eth.getAccounts();
 };
 
-const createElection = async (account, durationInMins) => {
+const createElection = async (account, durationInMins, electionName) => {
   const contractObject = getFactoryObject();
   const accounts = await web3.eth.getAccounts();
   const receipt = await contractObject.methods
-    .createElection(durationInMins)
+    .createElection(durationInMins, electionName)
     .send({ from: accounts[account], gas: 4000000 });
   console.info(receipt);
   console.info("New Election successfully created!");
@@ -38,9 +38,23 @@ const createElection = async (account, durationInMins) => {
 const getConductedElections = async () => {
   const contractObject = await getFactoryObject();
   const accounts = await web3.eth.getAccounts();
-  const result = await contractObject.methods
+  let result = [];
+  const elections = await contractObject.methods
     .getElections()
     .call({ from: accounts[0] });
+
+  for (let i = 0; i < elections.length; i++) {
+    const electionObject = await getContractObject(elections[i]);
+    const electionName = await electionObject.methods
+      .electionName()
+      .call({ from: accounts[0] });
+    result.push({
+      electionAddress: elections[i],
+      electionName: electionName
+    });
+    console.log("----------->", elections[i], electionName, "<-------------");
+  }
+
   console.log(result);
   return result;
 };
@@ -70,12 +84,22 @@ const getElectionAdmin = async address => {
   return result;
 };
 
-const addConsituency = async (account, address, consituency) => {
+const getElectionName = async address => {
+  const contractObject = getContractObject(address);
+  const accounts = await web3.eth.getAccounts();
+  const result = await contractObject.methods
+    .electionName()
+    .call({ from: accounts[0] });
+  console.log(result);
+  return result;
+};
+
+const addConsituency = async (account, address, consituencyId, name) => {
   const accounts = await web3.eth.getAccounts();
   const contractObject = getContractObject(address);
   console.info(`Sending transaction from account ${accounts[account]}`);
   const receipt = await contractObject.methods
-    .addConsituency(web3.utils.fromAscii(consituency))
+    .addConsituency(parseInt(consituencyId), name)
     .send({ from: accounts[account], gas: 1000000 });
   console.info(receipt);
   console.info("Consituency successfully added!");
@@ -87,32 +111,27 @@ const addConsituency = async (account, address, consituency) => {
 const getConsituencyList = async address => {
   const contractObject = getContractObject(address);
   const accounts = await web3.eth.getAccounts();
-  const listLength = await contractObject.methods
-    .getConsituencyListLength()
+  const consituencyIdList = await contractObject.methods
+    .getConsituencyIdList()
     .call({ from: accounts[0] });
-  // console.log(listLength);
+  // console.log(consituencyIdList);
+  const consituencyList = await consituencyIdList.map(consituencyId =>
+    getConsituency(address, consituencyId)
+  );
+  let result = await Promise.all(consituencyList);
 
-  let consituencyList = [];
-  for (let i = 0; i < listLength; i++) {
-    let consituency = await contractObject.methods
-      .consituencyList(i)
-      .call({ from: accounts[0] });
-    console.log("consituency: ", consituency);
-    consituencyList.push(
-      web3.utils.toAscii(consituency.consituencyId.split("0000", 1)[0])
-    );
-  }
-  // console.log(consituencyList);
-  return consituencyList;
+  return result;
 };
 
+// get the consituency
 const getConsituency = async (address, consituencyId) => {
+  console.log("logic", consituencyId);
   const contractObject = getContractObject(address);
   const accounts = await web3.eth.getAccounts();
   const result = await contractObject.methods
-    .consituencyData(web3.utils.fromAscii(consituencyId))
+    .consituencyData(consituencyId)
     .call({ from: accounts[0] });
-  console.log(result);
+  console.log("inside consituency", result);
   return result;
 };
 
@@ -126,50 +145,35 @@ const addVoter = async (
   consituency,
   age
 ) => {
-  const accounts = await web3.eth.getAccounts();
   const contractObject = getContractObject(address);
   const receipt = await contractObject.methods
-    .addVoter(
-      accounts[voterId],
-      name,
-      email,
-      phoneNo,
-      web3.utils.fromAscii(consituency),
-      age
-    )
-    .send({ from: accounts[account], gas: 3000000 });
+    .addVoter(voterId, name, email, phoneNo, consituency, age)
+    .send({ from: account, gas: 3000000 });
   console.info(receipt);
   console.info("Voter successfully added in the consituency !");
   return receipt;
 };
 
 const getVoterList = async address => {
+  console.log("-<", address);
   const contractObject = getContractObject(address);
   const accounts = await web3.eth.getAccounts();
-  const listLength = await contractObject.methods
-    .getVotersListLength()
+  const votersIdList = await contractObject.methods
+    .getVotersIdList()
     .call({ from: accounts[0] });
-  // console.log(listLength);
+  console.log("logic: get voter list:", votersIdList);
+  const votersList = await votersIdList.map(voter => getVoter(address, voter));
 
-  let voterList = [];
-  for (let i = 0; i < listLength; i++) {
-    let voters = await contractObject.methods
-      .votersList(i)
-      .call({ from: accounts[0] });
-    //console.log("voters: ", voters.votersId.split("0000", 1));
-    voterList.push(voters.voterId);
-  }
-  // console.log(voterList);
-  return voterList;
+  return await Promise.all(votersList);
 };
 
 const getVoter = async (address, voterId) => {
   const contractObject = getContractObject(address);
   const accounts = await web3.eth.getAccounts();
   const result = await contractObject.methods
-    .voterData(accounts[voterId])
+    .voterData(voterId)
     .call({ from: accounts[0] });
-  console.log(result);
+  // console.log("getVoter", result);
   return result;
 };
 
@@ -186,14 +190,8 @@ const addCandidate = async (
     const contractObject = getContractObject(address);
     const accounts = await web3.eth.getAccounts();
     const receipt = await contractObject.methods
-      .addCandidate(
-        accounts[candidateId],
-        name,
-        email,
-        phoneNo,
-        web3.utils.fromAscii(consituency)
-      )
-      .send({ from: accounts[account], gas: 1000000 });
+      .addCandidate(candidateId, name, email, phoneNo, consituency)
+      .send({ from: account, gas: 1000000 });
     console.info(receipt);
     console.info("Candidate successfully added in the consituency!");
     return receipt;
@@ -206,52 +204,93 @@ const addCandidate = async (
 const getCandidateList = async address => {
   const contractObject = getContractObject(address);
   const accounts = await web3.eth.getAccounts();
-  const listLength = await contractObject.methods
-    .getCandidatesListLength()
-    .call({ from: accounts[0] });
-  // console.log(listLength);
 
-  let candidateList = [];
-  for (let i = 0; i < listLength; i++) {
-    let candidate = await contractObject.methods
-      .candidateList(i)
-      .call({ from: accounts[0] });
-    //console.log("candidate: ", candidate.candidateId.split("0000", 1));
-    candidateList.push(candidate.candidateId);
-  }
+  const candidateIdList = await contractObject.methods
+    .getCandidatesIdList()
+    .call({ from: accounts[0] });
+
+  const candidateList = await candidateIdList.map(candidateId =>
+    getCandidate(address, candidateId)
+  );
   // console.log(candidateList);
-  return candidateList;
+  return await Promise.all(candidateList);
 };
 
 const getCandidate = async (address, candidateId) => {
   const contractObject = getContractObject(address);
   const accounts = await web3.eth.getAccounts();
   const result = await contractObject.methods
-    .candidateData(accounts[candidateId])
+    .candidateData(candidateId)
     .call({ from: accounts[0] });
   console.log(result);
   return result;
 };
 
-const castVote = async (address, account, candidateId) => {
+// get the candidateList enrolled in a consituency
+const getConsituencyCandidates = async (address, account, consituencyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const contractObject = getContractObject(address);
+      //const accounts = await web3.eth.getAccounts();
+      const candidateList = await contractObject.methods
+        .getConsituencyCandidates(consituencyId)
+        .call({ from: account });
+      console.log(candidateList);
+
+      resolve(candidateList);
+    } catch (error) {
+      console.error("get consituency candidates: ", error);
+      reject(error);
+    }
+  });
+};
+
+// get candidates of voter's consituency
+const getVoterConsituencyCandidates = async (address, account) => {
+  const contractObject = getContractObject(address);
+  const consituencyId = await contractObject.methods
+    .getVoterConsituency()
+    .call({ from: account });
+  console.log(consituencyId);
+  const candidateList = await getConsituencyCandidates(
+    address,
+    account,
+    consituencyId
+  );
+
+  let result = {
+    consituencyId: consituencyId,
+    candidateList: candidateList
+  };
+  return result;
+};
+
+const castVote = async (address, voterId, consituencyId, candidateId) => {
   const contractObject = getContractObject(address);
   const accounts = await web3.eth.getAccounts();
   const receipt = await contractObject.methods
-    .castVote(candidateId)
-    .send({ from: account, gas: 1000000 });
+    .castVote(consituencyId, candidateId)
+    .send({ from: voterId, gas: 1000000 });
   console.log(receipt);
   console.info("Voter's vote casted successfully!");
   return receipt;
 };
 
-const getVotingCount = async (address, consituency, candidateId) => {
-  const contractObject = getContractObject(address);
-  const accounts = await web3.eth.getAccounts();
-  const result = await contractObject.methods
-    .consituencyCandidateVotes(consituency, accounts[candidateId])
-    .call({ from: accounts[0] });
-  console.log(result);
-  return result;
+const getCandidateVotes = async (address, consituencyId, candidateId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const contractObject = getContractObject(address);
+      const accounts = await web3.eth.getAccounts();
+      const result = await contractObject.methods
+        .getVotes(consituencyId, candidateId)
+        .call({ from: accounts[0] });
+      console.log("inside getCandidateVotes", result);
+      resolve(result);
+    } catch (error) {
+      console.error("get candidate votes: ", error);
+      reject(error);
+    }
+  });
 };
 
 const closeElection = async (address, account) => {
@@ -266,54 +305,44 @@ const closeElection = async (address, account) => {
 };
 
 const winnerOfElection = async address => {
-  console.log("--------------Inside Here --------------");
+  let winners = {};
   const accounts = await web3.eth.getAccounts();
   const contractObject = getContractObject(address);
 
-  let winners = [];
-  // get all the the consituencies
-  const listLength = await contractObject.methods
-    .getConsituencyListLength()
-    .call({ from: accounts[0] });
-  console.log(listLength);
+  let consituencyIdList = await getConsituencyList(address);
+  consituencyIdList = consituencyIdList.map(consituencyId =>
+    parseInt(consituencyId)
+  );
 
-  for (let i = 0; i < listLength; i++) {
-    let consituency = await contractObject.methods
-      .consituencyList(i)
-      .call({ from: accounts[0] });
-    console.log(web3.utils.toAscii(consituency.consituencyId));
-    let maximumVotes = 0;
-    let winner;
-
-    console.log(consituency);
-    let newObj = await getConsituency(
+  for (i = 0; i < consituencyIdList.length; i++) {
+    let candidateIdList = await getConsituencyCandidates(
       address,
-      web3.utils.toAscii(consituency.consituencyId)
+      accounts[0],
+      consituencyIdList[i]
     );
-    console.log("newObj", newObj);
-    for (let j = 0; j < newObj.candidateCount; j++) {
-      console.log("-----------");
-      let candidate = await contractObject.methods
-        .consituencyCandidates(newObj.consituencyId, j)
-        .call({ from: accounts[0] });
-      console.log("----candidate", candidate);
-      let votes = await contractObject.methods
-        .consituencyCandidateVotes(newObj.consituencyId, candidate)
-        .call({ from: accounts[0] });
-      console.log("----votes -----", votes);
+    console.log("candidateList", candidateIdList);
+    let maxVotes = 0;
+    let candidate;
 
-      if (votes > maximumVotes) {
-        maximumVotes = votes;
-        winner = candidate;
+    for (j = 0; j < candidateIdList.length; j++) {
+      let votes = await getCandidateVotes(
+        address,
+        consituencyIdList[i],
+        candidateIdList[j]
+      );
+      //console.log(votes);
+      if (maxVotes < votes) {
+        maxVotes = votes;
+        candidate = candidateIdList[j];
       }
     }
 
-    winners.push({
-      consituency: consituency.consituencyId,
-      winner: winner
-    });
-    console.log(winners);
+    winners[consituencyIdList[i]] = {
+      candidateId: candidate,
+      votes: maxVotes
+    };
   }
+  console.log("winners", winners);
   return winners;
 };
 
@@ -323,6 +352,7 @@ module.exports = {
   getConductedElections,
   getElectionAddress,
   getElectionAdmin,
+  getElectionName,
   addConsituency,
   getConsituencyList,
   getConsituency,
@@ -332,8 +362,10 @@ module.exports = {
   addCandidate,
   getCandidateList,
   getCandidate,
+  getConsituencyCandidates,
+  getVoterConsituencyCandidates,
   castVote,
-  getVotingCount,
+  getCandidateVotes,
   closeElection,
   winnerOfElection
 };

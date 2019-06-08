@@ -15,7 +15,8 @@ router.post("/newElection", async function(req, res, next) {
   console.log("inside the ElectionAPI", req.body);
   const result = await logic.createElection(
     req.body.account,
-    req.body.duration
+    req.body.duration,
+    req.body.electionName
   );
   res.send(result);
   res.end("Election Created!");
@@ -23,8 +24,8 @@ router.post("/newElection", async function(req, res, next) {
 
 // get all conducted election list
 router.get("/getElections", async function(req, res, next) {
-  console.log(req.body);
   const result = await logic.getConductedElections();
+  console.log("list of conducted elections! ", result);
   res.send(result);
   res.end("List of conducted elections!");
 });
@@ -44,12 +45,24 @@ router.get("/getElectionAdmin/:address", async function(req, res, next) {
   res.end("Admin of the Election!");
 });
 
+// get election name of conducted eletion
+router.get("/getElectionName/:address", async function(req, res, next) {
+  const result = await logic.getElectionName(req.params.address);
+  res.send(result);
+  res.end("Name of the Election!");
+});
+
 // add Consituency to Consituency list
 router.post("/addConsituency/:address", async function(req, res, next) {
   console.log(req.body, req.params.address);
   const address = req.params.address;
-  const { account, consituency } = req.body;
-  const result = await logic.addConsituency(account, address, consituency);
+  const { account, consituencyId, consituencyName } = req.body;
+  const result = await logic.addConsituency(
+    account,
+    address,
+    consituencyId,
+    consituencyName
+  );
   res.send(result);
   res.end("Success");
 });
@@ -62,9 +75,10 @@ router.get("/getConsituencyList/:address", async function(req, res, next) {
 
 // get consituency data from Consituency list
 router.get("/getConsituency/:address", async function(req, res, next) {
+  //console.log("api", req.query, req.body, req.params);
   const result = await logic.getConsituency(
     req.params.address,
-    req.body.consituency
+    req.query.consituencyId
   );
   res.send(result);
 });
@@ -99,6 +113,7 @@ router.post("/addVoter/:address", async function(req, res, next) {
 // get voter list from Voter List
 router.get("/getVoterList/:address", async function(req, res, next) {
   const result = await logic.getVoterList(req.params.address);
+  // console.log("router: Get voter list: ", result);
   res.send(result);
 });
 
@@ -147,7 +162,20 @@ router.get("/getCandidateList/:address", async function(req, res, next) {
 router.get("/getCandidate/:address", async function(req, res, next) {
   const result = await logic.getCandidate(
     req.params.address,
-    req.body.candidateId
+    req.query.candidateId
+  );
+  res.send(result);
+});
+
+// get candidate list enrolled in a voter's consituency
+router.get("/getVoterConsituencyCandidates/:address", async function(
+  req,
+  res,
+  next
+) {
+  const result = await logic.getVoterConsituencyCandidates(
+    req.params.address,
+    req.query.account
   );
   res.send(result);
 });
@@ -157,6 +185,7 @@ router.post("/castVote/:address", async function(req, res, next) {
   const result = await logic.castVote(
     req.params.address,
     req.body.voterId,
+    req.body.consituencyId,
     req.body.candidateId
   );
   console.log(result);
