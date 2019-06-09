@@ -15,7 +15,7 @@ class Vote extends Component {
       candidateList: [],
       voter: "",
       candidate: "",
-      consituencyId: 4,
+      consituencyId: 0,
       message: ""
     };
     this.handleChange = this.handleChange.bind(this);
@@ -51,6 +51,18 @@ class Vote extends Component {
       [name]: value
     });
     console.log(result.value, result.name);
+    // get voters consituency
+    await axios
+      .get(endpoint + "/api/v1/getVoter/" + this.state.contractAddress, {
+        params: {
+          voterId: result.value
+        }
+      })
+      .then(res => {
+        this.setState({
+          consituencyId: parseInt(res.data.consituencyId)
+        });
+      });
     if (result.name == "voter") {
       await axios
         .get(
@@ -59,12 +71,13 @@ class Vote extends Component {
             this.state.contractAddress,
           {
             params: {
-              account: result.value
+              voterId: result.value,
+              consituencyId: this.state.consituencyId
             }
           }
         )
         .then(async res => {
-          console.log("res", res);
+          console.log("res", this.state.consituencyId);
           let candidateList = res.data.candidateList.map(candidateId =>
             axios
               .get(

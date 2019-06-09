@@ -83,10 +83,15 @@ class RegisterCandidate extends Component {
         consituency: this.state.candidateConsituency
       })
       .then(res => {
-        // console.log(res);
+        console.log(res);
         this.setState({
           message: res.data.transactionHash
         });
+      })
+      .catch(err => {
+        console.error("status:", err.status);
+        console.error("info:", err.message);
+        console.error("error:", err.error);
       });
   }
 
