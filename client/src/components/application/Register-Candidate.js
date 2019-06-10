@@ -12,12 +12,13 @@ class RegisterCandidate extends Component {
       admin: "",
       accounts: [],
       consituencyList: [],
+      candidateParty: "",
       contractAddress: "",
-      candidateAddress: 2,
+      candidateAddress: "",
       candidateName: "",
       candidateEmail: "",
       candidatePhone: "",
-      candidateConsituency: "Select Consituency",
+      candidateConsituency: "",
       message: "",
       value: ""
     };
@@ -80,7 +81,8 @@ class RegisterCandidate extends Component {
         name: this.state.candidateName,
         email: this.state.candidateEmail,
         phoneNo: this.state.candidatePhone,
-        consituency: this.state.candidateConsituency
+        consituency: this.state.candidateConsituency,
+        party: this.state.candidateParty
       })
       .then(res => {
         console.log(res);
@@ -131,6 +133,16 @@ class RegisterCandidate extends Component {
             options={this.state.accounts}
             value={this.state.candidateAddress}
           />
+          <Form.Field>
+            <label>Party</label>
+            <input
+              placeholder="Candidate Party"
+              type="text"
+              name="candidateParty"
+              onChange={this.onChange}
+              value={this.state.candidateParty}
+            />
+          </Form.Field>
           <Form.Field>
             <label>Name</label>
             <input

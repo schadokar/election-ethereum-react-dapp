@@ -254,13 +254,14 @@ const addCandidate = async (
   name,
   email,
   phoneNo,
-  consituency
+  consituency,
+  party
 ) => {
   try {
     const contractObject = getContractObject(address);
     const accounts = await web3.eth.getAccounts();
     const receipt = await contractObject.methods
-      .addCandidate(candidateId, name, email, phoneNo, consituency)
+      .addCandidate(candidateId, name, email, phoneNo, consituency, party)
       .send({ from: account, gas: 1000000 });
     console.info(receipt);
     console.info("Candidate successfully added in the consituency!");

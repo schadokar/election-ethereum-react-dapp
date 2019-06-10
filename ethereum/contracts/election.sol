@@ -41,6 +41,7 @@ contract Election {
         string email;
         string phoneNo;
         uint consituencyId;
+        string party;
     }
     
     struct Consituency {
@@ -88,7 +89,7 @@ contract Election {
         return consituencyList;
     }
    
-    function addCandidate(address _candidateId, string _name, string _email, string _phoneNo, uint _consituencyId) public onlyAdmin {
+    function addCandidate(address _candidateId, string _name, string _email, string _phoneNo, uint _consituencyId, string _party) public onlyAdmin {
         // check if admin is registering himself as candidate
         require(admin != _candidateId, "Admin can't be a candidate");
         
@@ -103,7 +104,7 @@ contract Election {
         candidateData[_candidateId].email = _email;
         candidateData[_candidateId].phoneNo = _phoneNo;
         candidateData[_candidateId].consituencyId = _consituencyId;
-        
+        candidateData[_candidateId].party = _party;
         // add candidate to its consituency
         consituencyData[_consituencyId].candidates.push(_candidateId);
     }

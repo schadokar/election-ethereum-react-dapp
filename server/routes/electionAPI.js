@@ -183,7 +183,8 @@ router.post("/addCandidate/:address", async function(req, res, next) {
       name,
       email,
       phoneNo,
-      consituency
+      consituency,
+      party
     } = req.body;
     const result = await logic.addCandidate(
       req.params.address,
@@ -192,7 +193,8 @@ router.post("/addCandidate/:address", async function(req, res, next) {
       name,
       email,
       phoneNo,
-      consituency
+      consituency,
+      party
     );
 
     res.send(result);

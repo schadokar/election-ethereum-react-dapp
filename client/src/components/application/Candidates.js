@@ -46,7 +46,7 @@ class Candidates extends Component {
       .get(endpoint + "/api/v1/getCandidateList/" + this.state.contractAddress)
       .then(res => {
         let arr = res.data;
-        //console.log(res.data);
+        console.log(res.data, "<-----------<");
         arr.map(candidate => {
           axios
             .get(
@@ -62,7 +62,8 @@ class Candidates extends Component {
                   candidateName: arr.name,
                   candidateEmail: arr.email,
                   candidatePhone: arr.phoneNo,
-                  candidateConsituency: arr.consituencyId
+                  candidateConsituency: arr.consituencyId,
+                  candidateParty: arr.party
                 }))
               });
             });
@@ -94,6 +95,7 @@ class Candidates extends Component {
           <Table.Cell>{candidate.candidateEmail}</Table.Cell>
           <Table.Cell>{candidate.candidatePhone}</Table.Cell>
           <Table.Cell>{candidate.candidateConsituency}</Table.Cell>
+          <Table.Cell>{candidate.candidateParty}</Table.Cell>
         </Table.Row>
       );
     });
@@ -119,6 +121,7 @@ class Candidates extends Component {
               <Table.HeaderCell>Email</Table.HeaderCell>
               <Table.HeaderCell>Phone No</Table.HeaderCell>
               <Table.HeaderCell>Consituency</Table.HeaderCell>
+              <Table.HeaderCell>Party</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>{this.candidateTable()}</Table.Body>
