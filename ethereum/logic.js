@@ -400,43 +400,49 @@ const closeElection = async (address, account) => {
 
 const winnerOfElection = async address => {
   try {
-    let winners = {};
+    let winners = [];
     const accounts = await web3.eth.getAccounts();
     const contractObject = getContractObject(address);
 
     let consituencyList = await getConsituencyList(address);
     console.log("woe,consList", consituencyList);
-    const consituencyIdList = consituencyList.map(consituency =>
-      parseInt(consituency.consituencyId)
-    );
+    const consituencyIdList = consituencyList.map(consituency => ({
+      consituencyId: parseInt(consituency.consituencyId),
+      consituencyName: consituency.name
+    }));
     console.log("consituency List", consituencyIdList);
     for (i = 0; i < consituencyIdList.length; i++) {
       let candidateIdList = await getConsituencyCandidates(
         address,
         accounts[0],
-        consituencyIdList[i]
+        consituencyIdList[i].consituencyId
       );
       console.log("candidateList", candidateIdList);
       let maxVotes = 0;
       let candidate;
-
+      let candidateName;
       for (j = 0; j < candidateIdList.length; j++) {
         let votes = await getCandidateVotes(
           address,
-          consituencyIdList[i],
+          consituencyIdList[i].consituencyId,
           candidateIdList[j]
         );
-        //console.log(votes);
+        let candidateData = await getCandidate(address, candidateIdList[i]);
+
         if (maxVotes < votes) {
           maxVotes = votes;
           candidate = candidateIdList[j];
+          candidateName = candidateData.name;
         }
       }
 
-      winners[consituencyIdList[i]] = {
+      winners.push({
+        consituencyId: consituencyIdList[i].consituencyId,
+        consituencyName: consituencyIdList[i].consituencyName,
         candidateId: candidate,
+        candidateName: candidateName,
         votes: maxVotes
-      };
+      });
     }
     console.log("winners", winners);
     return winners;

@@ -45,10 +45,10 @@ class Voters extends Component {
     // fetch all voters
     axios
       .get(endpoint + "/api/v1/getVoterList/" + this.state.contractAddress)
-      .then(res => {
+      .then(async res => {
         let arr = res.data;
         //console.log(res.data);
-        arr.map(voter => {
+        const consituencyList = await arr.map(voter => {
           axios
             .get(
               endpoint + "/api/v1/getConsituency/" + this.state.contractAddress,
@@ -57,19 +57,20 @@ class Voters extends Component {
               }
             )
             .then(res => {
-              this.setState({
-                voterList: arr.map(arr => ({
-                  voterId: arr.voterId,
-                  voterName: arr.name,
-                  voterEmail: arr.email,
-                  voterPhone: arr.phoneNo,
-                  voterConsituency: res.data.name
-                }))
-              });
-            })
-            .catch(e => {
-              console.error(e);
+              console.log(res.data.name);
+              return res.data.name;
             });
+        });
+
+        console.log(consituencyList);
+        this.setState({
+          voterList: arr.map((arr, index) => ({
+            voterId: arr.voterId,
+            voterName: arr.name,
+            voterEmail: arr.email,
+            voterPhone: arr.phoneNo,
+            voterConsituency: arr.consituencyId //this.state.consituencyNames[index]
+          }))
         });
       });
   }

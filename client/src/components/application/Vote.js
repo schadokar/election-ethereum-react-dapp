@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Form, Dropdown, Button, Message } from "semantic-ui-react";
 import axios from "axios";
 import ElectionHeader from "../layout/Election-Header";
-import Result from "./Result";
 
 const endpoint = "http://localhost:4000";
 
@@ -63,7 +62,7 @@ class Vote extends Component {
           consituencyId: parseInt(res.data.consituencyId)
         });
       });
-    if (result.name == "voter") {
+    if (result.name === "voter") {
       await axios
         .get(
           endpoint +

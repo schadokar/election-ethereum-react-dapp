@@ -62,7 +62,7 @@ class Candidates extends Component {
                   candidateName: arr.name,
                   candidateEmail: arr.email,
                   candidatePhone: arr.phoneNo,
-                  candidateConsituency: res.data.name
+                  candidateConsituency: arr.consituencyId
                 }))
               });
             });

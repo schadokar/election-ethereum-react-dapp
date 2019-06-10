@@ -23,7 +23,6 @@ contract Election {
     address public admin;
     string public electionName;
     bool electionStatus;
-    
     uint electionDuration;
 
     struct Voter {
@@ -183,7 +182,6 @@ contract Election {
     function getVotes(uint _consituencyId, address _candidateId) public view returns(uint) {
         return consituencyData[_consituencyId].votes[_candidateId];
     }
-    
     function closeElection() public onlyAdmin {
         require(now > electionDuration, "Election is not completed");
         require(electionStatus, "Election is not active");
