@@ -48,28 +48,31 @@ class Voters extends Component {
       .then(async res => {
         let arr = res.data;
         //console.log(res.data);
-        const consituencyList = await arr.map(voter => {
-          axios
-            .get(
-              endpoint + "/api/v1/getConsituency/" + this.state.contractAddress,
-              {
-                params: { consituencyId: parseInt(voter.consituencyId) }
-              }
-            )
-            .then(res => {
-              console.log(res.data.name);
-              return res.data.name;
-            });
-        });
+        let consituencyNames = await Promise.all(
+          arr.map(voter =>
+            axios
+              .get(
+                endpoint +
+                  "/api/v1/getConsituency/" +
+                  this.state.contractAddress,
+                {
+                  params: { consituencyId: parseInt(voter.consituencyId) }
+                }
+              )
+              .then(res => {
+                return res.data.name;
+              })
+          )
+        );
 
-        console.log(consituencyList);
+        // console.log(consituencyNames);
         this.setState({
           voterList: arr.map((arr, index) => ({
             voterId: arr.voterId,
             voterName: arr.name,
             voterEmail: arr.email,
             voterPhone: arr.phoneNo,
-            voterConsituency: arr.consituencyId //this.state.consituencyNames[index]
+            voterConsituency: consituencyNames[index] //this.state.consituencyNames[index]
           }))
         });
       });

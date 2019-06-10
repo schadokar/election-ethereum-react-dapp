@@ -42,33 +42,50 @@ class Candidates extends Component {
     });
 
     // fetch all candidates
-    axios
+    await axios
       .get(endpoint + "/api/v1/getCandidateList/" + this.state.contractAddress)
-      .then(res => {
+      .then(async res => {
         let arr = res.data;
         console.log(res.data, "<-----------<");
-        arr.map(candidate => {
-          axios
-            .get(
-              endpoint + "/api/v1/getConsituency/" + this.state.contractAddress,
-              {
-                params: { consituencyId: parseInt(candidate.consituencyId) }
-              }
-            )
-            .then(res => {
-              this.setState({
-                candidateList: arr.map(arr => ({
-                  candidateId: arr.candidateId,
-                  candidateName: arr.name,
-                  candidateEmail: arr.email,
-                  candidatePhone: arr.phoneNo,
-                  candidateConsituency: arr.consituencyId,
-                  candidateParty: arr.party
-                }))
-              });
-            });
+        let consituencyNames = await Promise.all(
+          arr.map(candidate =>
+            axios
+              .get(
+                endpoint +
+                  "/api/v1/getConsituency/" +
+                  this.state.contractAddress,
+                {
+                  params: { consituencyId: parseInt(candidate.consituencyId) }
+                }
+              )
+              .then(res => {
+                return res.data.name;
+              })
+          )
+        );
+
+        this.setState({
+          candidateList: arr.map((candidate, index) => ({
+            candidateId: candidate.candidateId,
+            candidateName: candidate.name,
+            candidateEmail: candidate.email,
+            candidatePhone: candidate.phoneNo,
+            candidateConsituency: consituencyNames[index],
+            candidateParty: candidate.party
+          }))
         });
       });
+
+    // let check = (await axios.get(
+    //   endpoint + "/api/v1/getConsituency/" + this.state.contractAddress,
+    //   {
+    //     params: { consituencyId: parseInt(0) }
+    //   }
+    // )).data.name;
+    // .then(res => {
+    //   return res.data;
+    // });
+    // console.log("check", check);
   }
 
   onChange(event) {

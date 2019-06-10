@@ -17,7 +17,7 @@ class RegisterVoter extends Component {
       voterName: "",
       voterEmail: "",
       voterPhone: "",
-      voterConsituency: "Select Consituency",
+      voterConsituency: "",
       voterAge: "",
       message: "",
       value: ""
