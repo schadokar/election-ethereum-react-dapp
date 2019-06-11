@@ -304,6 +304,7 @@ router.post("/closeElection/:address", async (req, res, next) => {
 router.post("/electionWinner/:address", async (req, res, next) => {
   try {
     const result = await logic.winnerOfElection(req.params.address);
+    console.log("election winner api result", result);
     res.send(result);
   } catch (error) {
     console.error(error);

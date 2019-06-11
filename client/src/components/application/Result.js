@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Message, Button, Table } from "semantic-ui-react";
+import { Message, Button, Table, Card } from "semantic-ui-react";
 import ElectionHeader from "../layout/Election-Header";
 
 const endpoint = "http://localhost:4000";
@@ -15,7 +15,11 @@ class Result extends Component {
       candidateId: "",
       votes: 0,
       winnerTable: false,
-      winnerList: []
+      winnerList: [],
+      partyConsituencyCount: [],
+      winningParty: "",
+      maxConsituencyWin: 0,
+      partyCountCard: false
     };
 
     this.closeElection = this.closeElection.bind(this);
@@ -60,28 +64,60 @@ class Result extends Component {
     axios
       .post(endpoint + "/api/v1/electionWinner/" + this.state.contractAddress)
       .then(res => {
-        console.log(res.data);
+        let partyData = res.data[1];
         this.setState({
-          winnerList: res.data.map(winner => ({
+          winnerList: res.data[0].map(winner => ({
             consituencyId: winner.consituencyId,
             consituencyName: winner.consituencyName,
             candidateId: winner.candidateId,
             candidateName: winner.candidateName,
-            votes: winner.votes
+            votes: winner.votes,
+            candidateParty: winner.candidateParty
           })),
-          winnerTable: true
+          partyConsituencyCount: partyData.partyCount,
+          winningParty: partyData.winningParty,
+          maxConsituencyWin: partyData.maxConsituencyWin,
+          winnerTable: true,
+          partyCountCard: true
         });
         this.setState({
           message: `Winner of the election is ${
-            Object.values(res.data)[0].candidateId
-          } total votes: ${Object.values(res.data)[0].votes}`,
-          candidateId: res.data.candidateId,
-          votes: res.data.votes
+            partyData.winningParty
+          } with maximum consituencies count ${partyData.maxConsituencyWin}`
         });
       });
   }
 
+  partyConsituencyCount() {
+    if (this.state.partyCountCard) {
+      let items = this.state.partyConsituencyCount.map(partyObj => ({
+        header: partyObj.party,
+        description: `Consituency Win Count: ${partyObj.seats}`
+      }));
+      return <Card.Group items={items} />;
+    }
+  }
+
   winnerTable() {
+    if (this.state.winnerTable) {
+      const { Header, HeaderCell, Row } = Table;
+      return (
+        <Table>
+          <Header>
+            <Row>
+              <HeaderCell>Candidate Id</HeaderCell>
+              <HeaderCell>Candidate Name</HeaderCell>
+              <HeaderCell>Votes</HeaderCell>
+              <HeaderCell>Consituency</HeaderCell>
+              <HeaderCell>Party</HeaderCell>
+            </Row>
+          </Header>
+          <Table.Body>{this.winnerTableBody()}</Table.Body>
+        </Table>
+      );
+    }
+  }
+  winnerTableBody() {
     if (this.state.winnerTable) {
       const { Row, Cell } = Table;
       return this.state.winnerList.map((winner, index) => {
@@ -91,7 +127,7 @@ class Result extends Component {
             <Cell>{winner.candidateName}</Cell>
             <Cell>{winner.votes}</Cell>
             <Cell>{winner.consituencyName}</Cell>
-            <Cell>Democratic</Cell>
+            <Cell>{winner.candidateParty}</Cell>
           </Row>
         );
       });
@@ -112,18 +148,8 @@ class Result extends Component {
           <Message.Header>Result</Message.Header>
           <p>{this.state.message}</p>
         </Message>
-        <Table>
-          <Header>
-            <Row>
-              <HeaderCell>Candidate Id</HeaderCell>
-              <HeaderCell>Candidate Name</HeaderCell>
-              <HeaderCell>Votes</HeaderCell>
-              <HeaderCell>Consituency</HeaderCell>
-              <HeaderCell>Party</HeaderCell>
-            </Row>
-          </Header>
-          <Table.Body>{this.winnerTable()}</Table.Body>
-        </Table>
+        {this.partyConsituencyCount()}
+        {this.winnerTable()}
       </div>
     );
   }

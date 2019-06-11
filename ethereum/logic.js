@@ -422,18 +422,20 @@ const winnerOfElection = async address => {
       let maxVotes = 0;
       let candidate;
       let candidateName;
+      let candidateParty;
       for (j = 0; j < candidateIdList.length; j++) {
         let votes = await getCandidateVotes(
           address,
           consituencyIdList[i].consituencyId,
           candidateIdList[j]
         );
-        let candidateData = await getCandidate(address, candidateIdList[i]);
+        let candidateData = await getCandidate(address, candidateIdList[j]);
 
         if (maxVotes < votes) {
           maxVotes = votes;
           candidate = candidateIdList[j];
           candidateName = candidateData.name;
+          candidateParty = candidateData.party;
         }
       }
 
@@ -442,11 +444,40 @@ const winnerOfElection = async address => {
         consituencyName: consituencyIdList[i].consituencyName,
         candidateId: candidate,
         candidateName: candidateName,
+        candidateParty: candidateParty,
         votes: maxVotes
       });
     }
     console.log("winners", winners);
-    return winners;
+    let parties = winners.map(winners => winners.candidateParty);
+    console.log("Parties:", parties);
+    parties = parties.filter(
+      (party, index) => parties.indexOf(party) === index
+    );
+    console.log("filtered parties", parties);
+    let electionCount = { partyCount: [] };
+    let electionWinningParty;
+    let maxConsituencyWin = 0;
+    for (k = 0; k < parties.length; k++) {
+      let seatCount = 0;
+      for (j = 0; j < winners.length; j++) {
+        if (parties[k] === winners[j].candidateParty) {
+          seatCount++;
+        }
+      }
+      electionCount.partyCount.push({
+        party: parties[k],
+        seats: seatCount
+      });
+      if (seatCount > maxConsituencyWin) {
+        maxConsituencyWin = seatCount;
+        electionWinningParty = parties[k];
+      }
+    }
+    electionCount["winningParty"] = electionWinningParty;
+    electionCount["maxConsituencyWin"] = maxConsituencyWin;
+    console.log(electionCount, electionWinningParty, "----<");
+    return [winners, electionCount];
   } catch (error) {
     console.error(error);
     throw error;
