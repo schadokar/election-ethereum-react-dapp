@@ -353,6 +353,14 @@ const getVoterConsituencyCandidates = async (
 
 const castVote = async (address, voterId, consituencyId, candidateId) => {
   try {
+    console.log(
+      "CAST VOTE",
+      address,
+      voterId,
+      consituencyId,
+      candidateId,
+      "CAST VOTE"
+    );
     const contractObject = getContractObject(address);
     const receipt = await contractObject.methods
       .castVote(consituencyId, candidateId)
