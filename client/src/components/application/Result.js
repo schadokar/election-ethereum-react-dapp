@@ -134,7 +134,6 @@ class Result extends Component {
     }
   }
   render() {
-    const { Header, HeaderCell, Row } = Table;
     return (
       <div>
         <ElectionHeader />
