@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, Button, Menu, Message } from "semantic-ui-react";
+import { Form, Button, Message, Table } from "semantic-ui-react";
 import axios from "axios";
 import ElectionHeader from "../layout/Election-Header";
 
@@ -11,6 +11,7 @@ class Election extends Component {
     this.state = {
       activeItem: "",
       contractAddress: "",
+      consituencyList: [],
       account: "",
       consituencyId: "",
       consituencyName: "",
@@ -27,8 +28,22 @@ class Election extends Component {
     await this.setState({
       contractAddress: url.split("/")[url.split("/").length - 1]
     });
-    // console.log(url.split("/")[url.split("/").length - 1]);
+
+    axios
+      .get(
+        endpoint + "/api/v1/getConsituencyList/" + this.state.contractAddress
+      )
+      .then(res => {
+        console.log("Consituency: ", res.data);
+        this.setState({
+          consituencyList: res.data.map(consituency => ({
+            consituencyId: consituency.consituencyId,
+            consituencyName: consituency.name
+          }))
+        });
+      });
   }
+
   handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
   onChange(event) {
@@ -37,8 +52,8 @@ class Election extends Component {
     });
   }
 
-  onSubmit() {
-    axios
+  async onSubmit() {
+    await axios
       .post(endpoint + "/api/v1/addConsituency/" + this.state.contractAddress, {
         account: 0,
         consituencyId: this.state.consituencyId,
@@ -47,10 +62,66 @@ class Election extends Component {
       .then(res => {
         console.log(res);
         this.setState({
-          message: res.data.transactionHash
+          message: `Consituency added successfully! TxHash: ${
+            res.data.transactionHash
+          }`
+        });
+      });
+
+    await axios
+      .get(
+        endpoint + "/api/v1/getConsituencyList/" + this.state.contractAddress
+      )
+      .then(res => {
+        console.log("Consituency: ", res.data);
+        this.setState({
+          consituencyList: res.data.map(consituency => ({
+            consituencyId: consituency.consituencyId,
+            consituencyName: consituency.name
+          }))
         });
       });
   }
+
+  message() {
+    if (this.state.message.length)
+      return (
+        <Message info>
+          <Message.Header>
+            <p>{this.state.message}</p>
+          </Message.Header>
+        </Message>
+      );
+  }
+
+  consituencyTable() {
+    if (this.state.consituencyList.length > 0) {
+      const { Header, HeaderCell, Row } = Table;
+      return (
+        <Table>
+          <Header>
+            <Row>
+              <HeaderCell>Consituency Id</HeaderCell>
+              <HeaderCell>Consituency Name</HeaderCell>
+            </Row>
+          </Header>
+          <Table.Body>{this.consituencyBody()}</Table.Body>
+        </Table>
+      );
+    }
+  }
+  consituencyBody() {
+    const { Row, Cell } = Table;
+    return this.state.consituencyList.map((consituency, index) => {
+      return (
+        <Row key={index}>
+          <Cell>{consituency.consituencyId}</Cell>
+          <Cell>{consituency.consituencyName}</Cell>
+        </Row>
+      );
+    });
+  }
+
   render() {
     return (
       <div>
@@ -81,11 +152,8 @@ class Election extends Component {
           </Button>
         </Form>
 
-        <Message info>
-          <Message.Header>
-            <p>{this.state.message}</p>
-          </Message.Header>
-        </Message>
+        {this.message()}
+        {this.consituencyTable()}
       </div>
     );
   }

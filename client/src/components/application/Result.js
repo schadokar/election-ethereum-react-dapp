@@ -74,11 +74,6 @@ class Result extends Component {
           })),
           winnerTable: true
         });
-        // this.setState({
-        //   message: `Winner of the election is ${
-        //     partyData.winningParty
-        //   } with maximum consituencies count ${partyData.maxConsituencyWin}`
-        // });
       });
 
     axios

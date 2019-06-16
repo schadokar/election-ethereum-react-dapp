@@ -511,7 +511,7 @@ const electionResult = async address => {
         winningParty = obj.party;
       }
     });
-    console.log(winningParty, winningSeats, "----><");
+    //console.log(winningParty, winningSeats, "----><");
     return [partyCount, winningParty, winningSeats];
   } catch (error) {
     console.error(error);
