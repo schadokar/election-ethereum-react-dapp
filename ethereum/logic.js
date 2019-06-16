@@ -163,7 +163,7 @@ const getConsituencyList = async address => {
       getConsituency(address, consituencyId)
     );
     let result = await Promise.all(consituencyList);
-    console.log("Inside getCOnsituencyList", result);
+    //   console.log("Inside getCOnsituencyList", result);
     return result;
   } catch (error) {
     console.error(error);
@@ -174,13 +174,13 @@ const getConsituencyList = async address => {
 // get the consituency
 const getConsituency = async (address, consituencyId) => {
   try {
-    console.log("logic", consituencyId);
+    //console.log("logic", consituencyId);
     const contractObject = getContractObject(address);
     const accounts = await web3.eth.getAccounts();
     const result = await contractObject.methods
       .consituencyData(consituencyId)
       .call({ from: accounts[0] });
-    console.log("inside consituency", result);
+    //    console.log("inside consituency", result);
     return result;
   } catch (error) {
     console.error(error);
@@ -299,7 +299,7 @@ const getCandidate = async (address, candidateId) => {
     const result = await contractObject.methods
       .candidateData(candidateId)
       .call({ from: accounts[0] });
-    console.log(result);
+    // console.log(result);
     return result;
   } catch (error) {
     console.error(error);
@@ -311,13 +311,15 @@ const getCandidate = async (address, candidateId) => {
 const getConsituencyCandidates = async (address, account, consituencyId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("--->", consituencyId);
       const contractObject = getContractObject(address);
       //const accounts = await web3.eth.getAccounts();
       const candidateList = await contractObject.methods
         .getConsituencyCandidates(consituencyId)
         .call({ from: account });
-      console.log("--->candidadaeLsist", candidateList);
+      // console.log(
+      //   "inside get consituency candidates: canidateList",
+      //   candidateList
+      // );
 
       resolve(candidateList);
     } catch (error) {
@@ -407,85 +409,110 @@ const closeElection = async (address, account) => {
   }
 };
 
-const winnerOfElection = async address => {
+const electionData = async address => {
   try {
-    let winners = [];
     const accounts = await web3.eth.getAccounts();
-    const contractObject = getContractObject(address);
 
-    let consituencyList = await getConsituencyList(address);
-    console.log("woe,consList", consituencyList);
-    const consituencyIdList = consituencyList.map(consituency => ({
-      consituencyId: parseInt(consituency.consituencyId),
-      consituencyName: consituency.name
-    }));
-    console.log("consituency List", consituencyIdList);
-    for (i = 0; i < consituencyIdList.length; i++) {
-      let candidateIdList = await getConsituencyCandidates(
-        address,
-        accounts[0],
-        consituencyIdList[i].consituencyId
-      );
-      console.log("candidateList", candidateIdList);
-      let maxVotes = 0;
-      let candidate;
-      let candidateName;
-      let candidateParty;
-      for (j = 0; j < candidateIdList.length; j++) {
-        let votes = await getCandidateVotes(
-          address,
-          consituencyIdList[i].consituencyId,
-          candidateIdList[j]
-        );
-        let candidateData = await getCandidate(address, candidateIdList[j]);
+    const consituencyList = await getConsituencyList(address);
 
-        if (maxVotes < votes) {
-          maxVotes = votes;
-          candidate = candidateIdList[j];
-          candidateName = candidateData.name;
-          candidateParty = candidateData.party;
-        }
-      }
-
-      winners.push({
-        consituencyId: consituencyIdList[i].consituencyId,
-        consituencyName: consituencyIdList[i].consituencyName,
-        candidateId: candidate,
-        candidateName: candidateName,
-        candidateParty: candidateParty,
-        votes: maxVotes
-      });
-    }
-    console.log("winners", winners);
-    let parties = winners.map(winners => winners.candidateParty);
-    console.log("Parties:", parties);
-    parties = parties.filter(
-      (party, index) => parties.indexOf(party) === index
+    const consituencyIdList = consituencyList.map(consituency =>
+      parseInt(consituency.consituencyId)
     );
-    console.log("filtered parties", parties);
-    let electionCount = { partyCount: [] };
-    let electionWinningParty;
-    let maxConsituencyWin = 0;
-    for (k = 0; k < parties.length; k++) {
-      let seatCount = 0;
-      for (j = 0; j < winners.length; j++) {
-        if (parties[k] === winners[j].candidateParty) {
-          seatCount++;
+
+    const consituencyCandidateList = await Promise.all(
+      consituencyIdList.map(async consituencyId => ({
+        consituencyId: consituencyId,
+        candidateList: await getConsituencyCandidates(
+          address,
+          accounts[0],
+          consituencyId
+        )
+      }))
+    );
+    // console.log(consituencyCandidateList);
+    let electionData = await Promise.all(
+      consituencyCandidateList.map(
+        async ({ consituencyId, candidateList }) =>
+          await Promise.all(
+            candidateList.map(async candidateId => {
+              const candidate = await getCandidate(address, candidateId);
+              const consituency = await getConsituency(address, consituencyId);
+              return {
+                consituencyId: consituencyId,
+                consituencyName: consituency.name,
+                candidateId: candidateId,
+                candidateName: candidate.name,
+                candidateParty: candidate.party,
+                votes: await getCandidateVotes(
+                  address,
+                  consituencyId,
+                  candidateId
+                )
+              };
+            })
+          )
+      )
+    );
+
+    // merge the nested arrays in one using reduce and concat
+    electionData = [].concat(...electionData);
+    //  console.log("Votes---> ", votes);
+    return electionData;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const electionResult = async address => {
+  try {
+    const electionDataArr = await electionData(address);
+    const consituencyList = [
+      ...new Set(electionDataArr.map(obj => obj.consituencyId))
+    ];
+    //console.log(consituencyList);
+    let partyCount = [
+      ...new Set(electionDataArr.map(obj => obj.candidateParty))
+    ].map((party, index) => ({
+      party: party,
+      count: 0,
+      index: index
+    }));
+    //console.log(partyCount);
+
+    consituencyList.forEach(consituencyId => {
+      const data = electionDataArr.filter(
+        obj => obj.consituencyId == consituencyId
+      );
+
+      let maxVotes = 0;
+      let party;
+
+      data.forEach(obj => {
+        if (maxVotes <= obj.votes) {
+          maxVotes = obj.votes;
+          party = obj.candidateParty;
         }
-      }
-      electionCount.partyCount.push({
-        party: parties[k],
-        seats: seatCount
       });
-      if (seatCount > maxConsituencyWin) {
-        maxConsituencyWin = seatCount;
-        electionWinningParty = parties[k];
+      // console.log("win party", maxVotes, party);
+
+      partyCount.forEach(obj => {
+        if (obj.party === party) {
+          obj.count++;
+        }
+      });
+    });
+    //console.log("PAr", partyCount);
+    let winningParty;
+    let winningSeats = 0;
+    partyCount.forEach(obj => {
+      if (winningSeats < obj.count) {
+        winningSeats = obj.count;
+        winningParty = obj.party;
       }
-    }
-    electionCount["winningParty"] = electionWinningParty;
-    electionCount["maxConsituencyWin"] = maxConsituencyWin;
-    console.log(electionCount, electionWinningParty, "----<");
-    return [winners, electionCount];
+    });
+    //console.log(winningParty, winningSeats, "----><");
+    return [partyCount, winningParty, winningSeats];
   } catch (error) {
     console.error(error);
     throw error;
@@ -513,5 +540,6 @@ module.exports = {
   castVote,
   getCandidateVotes,
   closeElection,
-  winnerOfElection
+  electionResult,
+  electionData
 };

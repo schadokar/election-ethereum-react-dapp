@@ -92,10 +92,11 @@ class Vote extends Component {
               })
           );
           candidateList = await Promise.all(candidateList);
+          console.log("candidates", candidateList);
           this.setState({
             candidateList: candidateList.map(candidate => ({
               key: candidate.candidateId,
-              text: candidate.name,
+              text: `${candidate.party} | ${candidate.name}`,
               value: candidate.candidateId
             }))
           });
@@ -120,6 +121,17 @@ class Vote extends Component {
       });
   }
 
+  message() {
+    if (this.state.message.length) {
+      return (
+        <Message info>
+          <Message.Header>
+            <p>{this.state.message}</p>
+          </Message.Header>
+        </Message>
+      );
+    }
+  }
   render() {
     return (
       <div>
@@ -151,11 +163,7 @@ class Vote extends Component {
             Cast Vote
           </Button>
         </Form>
-        <Message info>
-          <Message.Header>
-            <p>{this.state.message}</p>
-          </Message.Header>
-        </Message>
+        {this.message()}
       </div>
     );
   }
