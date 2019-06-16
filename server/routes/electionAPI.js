@@ -301,9 +301,21 @@ router.post("/closeElection/:address", async (req, res, next) => {
 });
 
 // get the winner of the election
-router.post("/electionWinner/:address", async (req, res, next) => {
+router.get("/electionResult/:address", async (req, res, next) => {
   try {
-    const result = await logic.winnerOfElection(req.params.address);
+    const result = await logic.electionResult(req.params.address);
+    console.log("election winner api result", result);
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.send(error);
+  }
+});
+
+// get the winner of the election
+router.get("/electionData/:address", async (req, res, next) => {
+  try {
+    const result = await logic.electionData(req.params.address);
     console.log("election winner api result", result);
     res.send(result);
   } catch (error) {
