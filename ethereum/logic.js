@@ -266,15 +266,18 @@ const addCandidate = async (
       parseInt(consituencyId)
     );
 
-    let status = (await Promise.all(
-      consituencyCandidates.map(async obj => {
-        const candidate = await getCandidate(address, obj);
-        if (candidate.party == party) {
-          return true;
-        } else return false;
-      })
-    )).reduce((current, next) => current || next);
+    let status = false;
 
+    if (consituencyCandidates.length) {
+      (await Promise.all(
+        consituencyCandidates.map(async obj => {
+          const candidate = await getCandidate(address, obj);
+          if (candidate.party == party) {
+            return true;
+          } else return false;
+        })
+      )).reduce((current, next) => current || next);
+    }
     if (!status) {
       const contractObject = getContractObject(address);
       const accounts = await web3.eth.getAccounts();
