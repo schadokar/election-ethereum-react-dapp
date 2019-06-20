@@ -254,18 +254,40 @@ const addCandidate = async (
   name,
   email,
   phoneNo,
-  consituency,
+  consituencyId,
   party
 ) => {
   try {
-    const contractObject = getContractObject(address);
-    const accounts = await web3.eth.getAccounts();
-    const receipt = await contractObject.methods
-      .addCandidate(candidateId, name, email, phoneNo, consituency, party)
-      .send({ from: account, gas: 1000000 });
-    console.info(receipt);
-    console.info("Candidate successfully added in the consituency!");
-    return receipt;
+    // first check if a candidate is already registered from a party to a consituency
+
+    const consituencyCandidates = await getConsituencyCandidates(
+      address,
+      account,
+      parseInt(consituencyId)
+    );
+
+    let status = (await Promise.all(
+      consituencyCandidates.map(async obj => {
+        const candidate = await getCandidate(address, obj);
+        if (candidate.party == party) {
+          return true;
+        } else return false;
+      })
+    )).reduce((current, next) => current || next);
+
+    if (!status) {
+      const contractObject = getContractObject(address);
+      const accounts = await web3.eth.getAccounts();
+      const receipt = await contractObject.methods
+        .addCandidate(candidateId, name, email, phoneNo, consituencyId, party)
+        .send({ from: account, gas: 1000000 });
+      console.info(receipt);
+      console.info("Candidate successfully added in the consituency!");
+      return receipt;
+    } else {
+      console.log("Party's candidate already registered");
+      return false;
+    }
   } catch (error) {
     console.error("logic.js: add candidate", error);
     throw error;
