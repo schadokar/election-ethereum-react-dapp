@@ -1,5 +1,3 @@
-MIT License
-
 # Voting Project
 
 ## Introduction
@@ -84,5 +82,8 @@ Result Tab:
 1. Close Election : Close Election
 2. Election Result : Get the Election Reult
 
+## License
+
+MIT License
 
 Copyright (c) 2019 Shubham Chadokar
