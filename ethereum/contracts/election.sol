@@ -77,7 +77,12 @@ contract Election {
         _;
     }
     
-    function addConsituency(uint _consituencyId, string _name) public onlyAdmin {
+    modifier isElectionActive {
+        require(electionStatus, "Election is close");
+        require(now < electionDuration, "Election is close");
+        _;
+    }
+    function addConsituency(uint _consituencyId, string _name) public onlyAdmin isElectionActive {
         require(!consituencyExist[_consituencyId], "consituency already exist");
         consituencyExist[_consituencyId] = true;
         consituencyData[_consituencyId].consituencyId = _consituencyId;
@@ -89,7 +94,7 @@ contract Election {
         return consituencyList;
     }
    
-    function addCandidate(address _candidateId, string _name, string _email, string _phoneNo, uint _consituencyId, string _party) public onlyAdmin {
+    function addCandidate(address _candidateId, string _name, string _email, string _phoneNo, uint _consituencyId, string _party) public onlyAdmin isElectionActive{
         // check if admin is registering himself as candidate
         require(admin != _candidateId, "Admin can't be a candidate");
         
@@ -124,7 +129,7 @@ contract Election {
     }
     
     function addVoter(address _voterId, string _name, string _email,string _phoneNo, uint _consituencyId, uint8 _age) 
-        public onlyAdmin {
+        public onlyAdmin isElectionActive{
         // check if admin is registering himself
         require(admin != _voterId, "Admin can't be a voter");
         // It will check if voter is registered or not
@@ -160,7 +165,7 @@ contract Election {
         return voterData[msg.sender].consituencyId;
     }
     
-    function castVote(uint _consituencyId, address _candidateId) public returns(bool status) {
+    function castVote(uint _consituencyId, address _candidateId) public isElectionActive returns(bool status) {
          //election must be active
         require(electionStatus, "Election must be on/active");
 

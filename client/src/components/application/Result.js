@@ -88,9 +88,9 @@ class Result extends Component {
             index: obj.index
           })),
           partyCountCard: true,
-          message: `Winner of the election is ${
+          message: `Result of the election is ${
             res.data[1]
-          } with maximum consituencies count ${res.data[2]}`
+          } won maximum consituencies with count ${res.data[2]}`
         });
       });
   }

@@ -272,9 +272,10 @@ const addCandidate = async (
       (await Promise.all(
         consituencyCandidates.map(async obj => {
           const candidate = await getCandidate(address, obj);
-          if (candidate.party == party) {
-            return true;
-          } else return false;
+          console.log(obj, "----<>");
+          if (candidate.party == party.toUpperCase()) {
+            status = true;
+          } else status = false;
         })
       )).reduce((current, next) => current || next);
     }
@@ -282,7 +283,14 @@ const addCandidate = async (
       const contractObject = getContractObject(address);
       const accounts = await web3.eth.getAccounts();
       const receipt = await contractObject.methods
-        .addCandidate(candidateId, name, email, phoneNo, consituencyId, party)
+        .addCandidate(
+          candidateId,
+          name,
+          email,
+          phoneNo,
+          consituencyId,
+          party.toUpperCase()
+        )
         .send({ from: account, gas: 1000000 });
       console.info(receipt);
       console.info("Candidate successfully added in the consituency!");
@@ -491,11 +499,15 @@ const electionData = async address => {
 
 const electionResult = async address => {
   try {
+    // get all the election data, candidate vote count
     const electionDataArr = await electionData(address);
+    // get all the consituency list names
     const consituencyList = [
       ...new Set(electionDataArr.map(obj => obj.consituencyId))
     ];
     //console.log(consituencyList);
+
+    // Initiate the partyCount with object (party, seat count, index)
     let partyCount = [
       ...new Set(electionDataArr.map(obj => obj.candidateParty))
     ].map((party, index) => ({
@@ -505,7 +517,9 @@ const electionResult = async address => {
     }));
     //console.log(partyCount);
 
+    // who won the consituency
     consituencyList.forEach(consituencyId => {
+      // filter the candidates as per the consituency
       const data = electionDataArr.filter(
         obj => obj.consituencyId == consituencyId
       );
@@ -528,12 +542,12 @@ const electionResult = async address => {
       });
     });
     //console.log("PAr", partyCount);
-    let winningParty;
+    let winningParty = [];
     let winningSeats = 0;
     partyCount.forEach(obj => {
-      if (winningSeats < obj.count) {
+      if (winningSeats <= obj.count) {
         winningSeats = obj.count;
-        winningParty = obj.party;
+        winningParty.push(obj.party);
       }
     });
     //console.log(winningParty, winningSeats, "----><");

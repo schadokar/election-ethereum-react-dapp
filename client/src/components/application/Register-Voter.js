@@ -88,7 +88,9 @@ class RegisterVoter extends Component {
       .then(res => {
         console.log(res);
         this.setState({
-          message: res.data.transactionHash
+          message: `Voter successfully added! TxHash: ${
+            res.data.transactionHash
+          }`
         });
       });
   }

@@ -10,11 +10,12 @@ import RegisterVoter from "../src/components/application/Register-Voter";
 import RegisterCandidate from "../src/components/application/Register-Candidate";
 import Vote from "../src/components/application/Vote";
 import Result from "../src/components/application/Result";
+import "./App.css";
 
 class App extends Component {
   render() {
     return (
-      <div>
+      <div className="container">
         <Container>
           <Header />
           <Router>
