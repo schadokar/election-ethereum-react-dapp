@@ -1,3 +1,7 @@
+MIT License
+
+Copyright (c) 2019 Shubham Chadokar
+
 # Voting Project
 
 ## Introduction
