@@ -20,6 +20,30 @@ Following are the work still not completed:
 2. It is assumed that in Every consituency one party must get majority votes.
 3. Form Validation is not implemented.
 
+## System requirement
+
+1. nodejs 8.x or greater (This dapp is developed on node v8.x)
+2. npm install -g ganache-cli
+
+## Set up
+
+1. git clone https://github.com/schadokar/election-ethereum-react-dapp.git
+2. npm install (Install all the server and ethereum dependencies)
+3. npm install (From client directory to install all the react dependencies)
+
+## Start the DAPP
+
+Open 3 command window or terminal
+From Project Root Directory
+
+#### Terminal 1: ganache-cli
+
+#### Terminal 2: npm run dev
+
+From Client Directory
+
+#### Terminal 3: npm start
+
 ## Election
 
 Every election is active for n minutes. While deploying a new Election duration of election in mins and name of the election must be passed.
