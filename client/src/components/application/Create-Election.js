@@ -12,14 +12,18 @@ class CreateElection extends Component {
       accountIndex: 0,
       duration: "",
       electionName: "",
-      message: "Create new Election",
+      message: "",
       electionList: [],
       items: [],
-      loading: false
+      loading: false,
+      loadingDeploy: false,
+      loadingCompile: false
     };
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.compile = this.compile.bind(this);
+    this.deploy = this.deploy.bind(this);
   }
 
   onChange(event) {
@@ -52,6 +56,33 @@ class CreateElection extends Component {
     this.setState({ loading: false });
   }
 
+  async compile() {
+    this.setState({ loadingCompile: true });
+    await axios.post(endpoint + "/contract/compile").then(res => {
+      console.log(res.data);
+      this.setState({
+        message: res.data
+      });
+    });
+    this.setState({ loadingCompile: false });
+  }
+
+  async deploy() {
+    this.setState({ loadingDeploy: true });
+    await axios.post(endpoint + "/contract/deploy").then(res => {
+      console.log(res.data);
+      this.setState({
+        message: `Contract deployed Successfully! Address: ${res.data.address}`
+      });
+    });
+    this.setState({ loadingDeploy: false });
+  }
+
+  message() {
+    if (this.state.message.length) {
+      return <Message info>{this.state.message}</Message>;
+    }
+  }
   componentDidMount() {
     this.getElectionList();
   }
@@ -82,6 +113,22 @@ class CreateElection extends Component {
   render() {
     return (
       <div>
+        <div style={{ paddingBottom: "10px" }}>
+          <Button
+            loading={this.state.loadingCompile}
+            onClick={this.compile}
+            primary
+          >
+            Compile Contract
+          </Button>
+          <Button
+            loading={this.state.loadingDeploy}
+            onClick={this.deploy}
+            primary
+          >
+            Deploy Election Factory Contract
+          </Button>
+        </div>
         <Form onSubmit={this.onSubmit}>
           <Form.Field>
             <Input
@@ -106,7 +153,7 @@ class CreateElection extends Component {
           <Button loading={this.state.loading} primary>
             Create
           </Button>
-          <Message info>{this.state.message}</Message>
+          {this.message()}
         </Form>
         <Divider horizontal>Elections</Divider>
         <Card.Group items={this.state.items} />

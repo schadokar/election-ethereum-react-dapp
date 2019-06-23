@@ -71,6 +71,7 @@ class Candidates extends Component {
             candidateEmail: candidate.email,
             candidatePhone: candidate.phoneNo,
             candidateConsituency: consituencyNames[index],
+            candidateConsituencyId: candidate.consituencyId,
             candidateParty: candidate.party
           }))
         });
@@ -112,6 +113,7 @@ class Candidates extends Component {
           <Table.Cell>{candidate.candidateEmail}</Table.Cell>
           <Table.Cell>{candidate.candidatePhone}</Table.Cell>
           <Table.Cell>{candidate.candidateConsituency}</Table.Cell>
+          <Table.Cell>{candidate.candidateConsituencyId}</Table.Cell>
           <Table.Cell>{candidate.candidateParty}</Table.Cell>
         </Table.Row>
       );
@@ -138,6 +140,7 @@ class Candidates extends Component {
               <Table.HeaderCell>Email</Table.HeaderCell>
               <Table.HeaderCell>Phone No</Table.HeaderCell>
               <Table.HeaderCell>Consituency</Table.HeaderCell>
+              <Table.HeaderCell>Consituency Id</Table.HeaderCell>
               <Table.HeaderCell>Party</Table.HeaderCell>
             </Table.Row>
           </Table.Header>

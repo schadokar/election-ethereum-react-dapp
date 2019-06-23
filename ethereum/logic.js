@@ -525,25 +525,33 @@ const electionResult = async address => {
       );
 
       let maxVotes = 0;
-      let party;
+      let party = [];
 
       data.forEach(obj => {
-        if (maxVotes <= obj.votes) {
+        if (maxVotes <= obj.votes && obj.votes > 0) {
           maxVotes = obj.votes;
-          party = obj.candidateParty;
+          party.push(obj.candidateParty);
         }
       });
       // console.log("win party", maxVotes, party);
-
-      partyCount.forEach(obj => {
-        if (obj.party === party) {
-          obj.count++;
-        }
-      });
+      if (party.length == 1) {
+        partyCount.forEach(obj => {
+          if (obj.party === party[0]) {
+            obj.count++;
+          }
+        });
+      }
     });
     //console.log("PAr", partyCount);
     let winningParty = [];
-    let winningSeats = 0;
+    let winningSeats = partyCount
+      .map(party => party.count)
+      .reduce((a, b) => {
+        // console.log("a,b", a, b);
+        return Math.max(a, b);
+      });
+    console.log("wseats", winningSeats);
+
     partyCount.forEach(obj => {
       if (winningSeats <= obj.count) {
         winningSeats = obj.count;

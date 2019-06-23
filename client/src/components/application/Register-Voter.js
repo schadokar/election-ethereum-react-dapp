@@ -61,7 +61,7 @@ class RegisterVoter extends Component {
         this.setState({
           consituencyList: arr.map(arr => ({
             key: arr.consituencyId,
-            text: arr.name,
+            text: `${arr.consituencyId} | ${arr.name}`,
             value: arr.consituencyId
           }))
         });

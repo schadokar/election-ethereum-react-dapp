@@ -72,7 +72,8 @@ class Voters extends Component {
             voterName: arr.name,
             voterEmail: arr.email,
             voterPhone: arr.phoneNo,
-            voterConsituency: consituencyNames[index] //this.state.consituencyNames[index]
+            voterConsituency: consituencyNames[index], //this.state.consituencyNames[index],
+            voterConsituencyId: arr.consituencyId
           }))
         });
       });
@@ -101,6 +102,7 @@ class Voters extends Component {
           <Table.Cell>{voter.voterEmail}</Table.Cell>
           <Table.Cell>{voter.voterPhone}</Table.Cell>
           <Table.Cell>{voter.voterConsituency}</Table.Cell>
+          <Table.Cell>{voter.voterConsituencyId}</Table.Cell>
         </Table.Row>
       );
     });
@@ -126,6 +128,7 @@ class Voters extends Component {
               <Table.HeaderCell>Email</Table.HeaderCell>
               <Table.HeaderCell>Phone No</Table.HeaderCell>
               <Table.HeaderCell>Consituency</Table.HeaderCell>
+              <Table.HeaderCell>Consituency Id</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>{this.voterTable()}</Table.Body>
