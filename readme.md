@@ -58,37 +58,73 @@ Compile and Deploy the Election Factory from the home page. http://localhost:300
 
 Click on Compile to compile the contract.
 
-![](images\compile.PNG)
+<img src="./images/compile.PNG"></img>
+
 
 Click on Deploy to deploy the contract.
 
-![](images\deploy.PNG)
+<img src="./images/deploy.PNG"></img>
 
 ### Step 2:
 
 Create new Election. Pass duration of election in mins and Name of the election.
+Click on Create.
+
+<img src="./images/create-election.PNG"></img>
 
 ### Step 3:
 
-Go to new Election.
-Create Consituencies for the election.
-Pass the consituency Id. Integer
-Pass the consituency number. String
+Go to the new Election.  
+Create the Consituencies for the election.  
+Pass the consituency Id -- Integer   
+Pass the consituency name. String  
+
+<img src="./images/add-consituency.PNG"></img>  
+
 
 ### Step 4:
 
-Register voters and candidates.
+Click on Register candidates   
+
+<img src="./images/register-candidate.PNG"> </img>    
+
+I have created the extra candidates.   
+
+Click on Candidates to see all the registered candidates.   
+
+<img src="./images/candidates.PNG"></img>    
+
+Click on Register voters   
+
+<img src="./images/register-voter.PNG"></img>    
+
+I have created the extra voters.   
+
+Click on the Voters to see all the registered voters.    
+
+<img src="./images/voters.PNG"></img>   
 
 ### Step 5:
 
-Vote Tab: Cast Vote
+Vote Tab: Cast Vote    
+
+Cast your vote by selecting the voter. Once the voter is selected its respective constituency candidates will gets loaded.  
+
+<img src="./images/cast-vote.PNG"></img>   
+
+I casted the remaining votes.
 
 ### Step 6:
 
-Result Tab:
+Result Tab:  
 
-1. Close Election : Close Election
-2. Election Result : Get the Election Reult
+1. Click on the Close Election to close the election   
+
+<img src="./images/close-election.PNG"></img>   
+
+2. Click on the Election Result to get the election result.   
+
+<img src="./images/voting-result.PNG"></img>
 
 ## License
 
