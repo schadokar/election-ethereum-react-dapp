@@ -33,7 +33,7 @@ class Result extends Component {
       contractAddress: url.split("/")[url.split("/").length - 1]
     });
 
-    await axios
+    axios
       .get(endpoint + "/api/v1/getElectionAdmin/" + this.state.contractAddress)
       .then(res => {
         this.setState({
@@ -50,9 +50,15 @@ class Result extends Component {
         account: this.state.admin
       })
       .then(res => {
-        this.setState({
-          message: res.data.transactionHash
-        });
+        if (res.data.status)
+          this.setState({
+            message: `${res.data.message}! TxHash: ${res.data.transactionHash}`
+          });
+        else {
+          this.setState({
+            message: `${res.data.message}! `
+          });
+        }
       });
   }
 

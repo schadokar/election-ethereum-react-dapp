@@ -43,7 +43,8 @@ class CreateElection extends Component {
         .then(res => {
           console.log("------------", res);
           this.setState({
-            message: `Transaction Hash: ${res.data.transactionHash}`
+            message: `Transaction Hash: ${res.data.transactionHash}`,
+            loading: false
           });
           this.getElectionList();
         })
@@ -53,29 +54,29 @@ class CreateElection extends Component {
     } catch (error) {
       console.log(error);
     }
-    this.setState({ loading: false });
   }
 
-  async compile() {
+  compile() {
     this.setState({ loadingCompile: true });
-    await axios.post(endpoint + "/contract/compile").then(res => {
+    axios.post(endpoint + "/contract/compile").then(res => {
       console.log(res.data);
       this.setState({
-        message: res.data
+        message: res.data,
+        loadingCompile: false
       });
     });
-    this.setState({ loadingCompile: false });
   }
 
-  async deploy() {
+  deploy() {
     this.setState({ loadingDeploy: true });
-    await axios.post(endpoint + "/contract/deploy").then(res => {
+    axios.post(endpoint + "/contract/deploy").then(res => {
       console.log(res.data);
       this.setState({
-        message: `Contract deployed Successfully! Address: ${res.data.address}`
+        message: `Contract deployed Successfully! Address: ${res.data.address}`,
+        loadingDeploy: false,
+        electionList: []
       });
     });
-    this.setState({ loadingDeploy: false });
   }
 
   message() {
@@ -93,7 +94,7 @@ class CreateElection extends Component {
       this.setState({
         electionList: res.data,
         items: res.data.reverse().map(election => {
-          console.log("--->", election);
+          // console.log("--->", election);
           let card = {
             header: election.electionName,
             description: (

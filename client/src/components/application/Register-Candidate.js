@@ -46,7 +46,7 @@ class RegisterCandidate extends Component {
           value: arr
         }))
       });
-      console.log(this.state.accounts);
+      // console.log(this.state.accounts);
     });
 
     // get the available consituency List
@@ -86,9 +86,15 @@ class RegisterCandidate extends Component {
       })
       .then(res => {
         console.log(res);
-        this.setState({
-          message: res.data.transactionHash
-        });
+        if (res.data.status)
+          this.setState({
+            message: `${res.data.message}! TxHash: ${res.data.transactionHash}`
+          });
+        else {
+          this.setState({
+            message: `${res.data.message}! `
+          });
+        }
       })
       .catch(err => {
         console.error("status:", err.status);

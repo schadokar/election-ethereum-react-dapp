@@ -196,7 +196,7 @@ router.post("/addCandidate/:address", async function(req, res, next) {
       consituency,
       party
     );
-
+    // console.log("---", result.message, "---");
     res.send(result);
   } catch (error) {
     next(error);

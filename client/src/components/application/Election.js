@@ -53,34 +53,35 @@ class Election extends Component {
   }
 
   async onSubmit() {
-    await axios
-      .post(endpoint + "/api/v1/addConsituency/" + this.state.contractAddress, {
+    const res = await axios.post(
+      endpoint + "/api/v1/addConsituency/" + this.state.contractAddress,
+      {
         account: 0,
         consituencyId: this.state.consituencyId,
         consituencyName: this.state.consituencyName
-      })
-      .then(res => {
-        console.log(res);
-        this.setState({
-          message: `Consituency added successfully! TxHash: ${
-            res.data.transactionHash
-          }`
-        });
+      }
+    );
+    console.log(res);
+    if (res.data.status)
+      this.setState({
+        message: `${res.data.message}! TxHash: ${res.data.transactionHash}`
       });
+    else {
+      this.setState({
+        message: `${res.data.message}! `
+      });
+    }
 
-    await axios
-      .get(
-        endpoint + "/api/v1/getConsituencyList/" + this.state.contractAddress
-      )
-      .then(res => {
-        console.log("Consituency: ", res.data);
-        this.setState({
-          consituencyList: res.data.map(consituency => ({
-            consituencyId: consituency.consituencyId,
-            consituencyName: consituency.name
-          }))
-        });
-      });
+    const consituencyList = await axios.get(
+      endpoint + "/api/v1/getConsituencyList/" + this.state.contractAddress
+    );
+
+    this.setState({
+      consituencyList: consituencyList.data.map(consituency => ({
+        consituencyId: consituency.consituencyId,
+        consituencyName: consituency.name
+      }))
+    });
   }
 
   message() {

@@ -76,17 +76,6 @@ class Candidates extends Component {
           }))
         });
       });
-
-    // let check = (await axios.get(
-    //   endpoint + "/api/v1/getConsituency/" + this.state.contractAddress,
-    //   {
-    //     params: { consituencyId: parseInt(0) }
-    //   }
-    // )).data.name;
-    // .then(res => {
-    //   return res.data;
-    // });
-    // console.log("check", check);
   }
 
   onChange(event) {

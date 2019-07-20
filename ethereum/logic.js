@@ -134,6 +134,7 @@ const getElectionName = async address => {
 };
 
 const addConsituency = async (account, address, consituencyId, name) => {
+  let response = {};
   try {
     const accounts = await web3.eth.getAccounts();
     const contractObject = getContractObject(address);
@@ -144,9 +145,15 @@ const addConsituency = async (account, address, consituencyId, name) => {
     console.info(receipt);
     console.info("Consituency successfully added!");
     //  console.info(web3.utils.fromAscii(consituency));
-    return receipt;
+    response["status"] = true;
+    response["message"] = "Consituency successfully added!";
+    response["transactionHash"] = receipt.transactionHash;
+    return response;
   } catch (error) {
-    console.error(error);
+    console.error("ERROR: ", error.message);
+    response["status"] = false;
+    response["message"] = error.message.split("revert")[1];
+    return response;
   }
 };
 
@@ -198,6 +205,7 @@ const addVoter = async (
   consituency,
   age
 ) => {
+  let response = {};
   try {
     const contractObject = getContractObject(address);
     const receipt = await contractObject.methods
@@ -205,11 +213,16 @@ const addVoter = async (
       .send({ from: account, gas: 3000000 });
     console.info(receipt);
     console.info("Voter successfully added in the consituency !");
-    return receipt;
+    response["status"] = true;
+    response["message"] = "Voter successfully added in the consituency!";
+    response["transactionHash"] = receipt.transactionHash;
+    return response;
   } catch (error) {
-    console.error("ERROR: ", error);
+    // console.error("ERROR: ", error);
     console.error("ERROR: ", error.message);
-    throw error;
+    response["status"] = false;
+    response["message"] = error.message.split("revert")[1];
+    return response;
   }
 };
 
@@ -257,6 +270,7 @@ const addCandidate = async (
   consituencyId,
   party
 ) => {
+  let response = {};
   try {
     // first check if a candidate is already registered from a party to a consituency
 
@@ -269,7 +283,7 @@ const addCandidate = async (
     let status = false;
 
     if (consituencyCandidates.length) {
-      (await Promise.all(
+      await Promise.all(
         consituencyCandidates.map(async obj => {
           const candidate = await getCandidate(address, obj);
           console.log(obj, "----<>");
@@ -277,11 +291,11 @@ const addCandidate = async (
             status = true;
           } else status = false;
         })
-      )).reduce((current, next) => current || next);
+      );
     }
     if (!status) {
       const contractObject = getContractObject(address);
-      const accounts = await web3.eth.getAccounts();
+      // const accounts = await web3.eth.getAccounts();
       const receipt = await contractObject.methods
         .addCandidate(
           candidateId,
@@ -294,14 +308,22 @@ const addCandidate = async (
         .send({ from: account, gas: 1000000 });
       console.info(receipt);
       console.info("Candidate successfully added in the consituency!");
-      return receipt;
+      response["status"] = true;
+      response["message"] = "Candidate successfully added in the consituency!";
+      response["transactionHash"] = receipt.transactionHash;
     } else {
       console.log("Party's candidate already registered");
-      return false;
+      response["status"] = false;
+      response["message"] = "Party's candidate already registered";
+      response["transactionHash"] = null;
     }
+    return response;
   } catch (error) {
     console.error("logic.js: add candidate", error);
-    throw error;
+    response["status"] = false;
+    response["message"] = error.message.split("revert")[1];
+
+    return response;
   }
 };
 
@@ -387,25 +409,31 @@ const getVoterConsituencyCandidates = async (
 };
 
 const castVote = async (address, voterId, consituencyId, candidateId) => {
+  let response = {};
   try {
-    console.log(
-      "CAST VOTE",
-      address,
-      voterId,
-      consituencyId,
-      candidateId,
-      "CAST VOTE"
-    );
+    // console.log(
+    //   "CAST VOTE",
+    //   address,
+    //   voterId,
+    //   consituencyId,
+    //   candidateId,
+    //   "CAST VOTE"
+    // );
     const contractObject = getContractObject(address);
     const receipt = await contractObject.methods
       .castVote(consituencyId, candidateId)
       .send({ from: voterId, gas: 1000000 });
-    console.log(receipt);
+    // console.log(receipt);
     console.info("Voter's vote casted successfully!");
-    return receipt;
+    response["status"] = true;
+    response["message"] = "Voter's vote casted successfully!";
+    response["transactionHash"] = receipt.transactionHash;
+    return response;
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error("ERROR: ", error.message);
+    response["status"] = false;
+    response["message"] = error.message.split("revert")[1];
+    return response;
   }
 };
 
@@ -427,18 +455,24 @@ const getCandidateVotes = async (address, consituencyId, candidateId) => {
 };
 
 const closeElection = async (address, account) => {
+  let response = {};
   try {
-    const accounts = await web3.eth.getAccounts();
+    // const accounts = await web3.eth.getAccounts();
     const contractObject = getContractObject(address);
     const receipt = await contractObject.methods
       .closeElection()
       .send({ from: account, gas: 1000000 });
-    console.info(receipt);
-    console.info("election closed successfully!");
-    return receipt;
+    // console.info(receipt);
+    console.info("Election closed successfully!");
+    response["status"] = true;
+    response["message"] = "Election closed successfully!";
+    response["transactionHash"] = receipt.transactionHash;
+    return response;
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error("ERROR: ", error.message);
+    response["status"] = false;
+    response["message"] = error.message.split("revert")[1];
+    return response;
   }
 };
 

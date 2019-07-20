@@ -20,7 +20,7 @@ app.use("/api/v1", electionAPIRoutes);
 app.use("/contract", contractAPIRoutes);
 
 app.use(function(err, req, res, next) {
-  console.log("________-------->", err);
+  console.log("next middleware", err);
   res.status(422).send({ error: err.message });
 });
 

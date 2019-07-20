@@ -83,7 +83,7 @@ contract Election {
     //     _;
     // }
     function addConsituency(uint _consituencyId, string _name) public onlyAdmin {
-        require(!consituencyExist[_consituencyId], "consituency already exist");
+        require(!consituencyExist[_consituencyId], "Consituency already exist");
         consituencyExist[_consituencyId] = true;
         consituencyData[_consituencyId].consituencyId = _consituencyId;
         consituencyData[_consituencyId].name = _name;
@@ -173,7 +173,7 @@ contract Election {
         require(admin != msg.sender, "Admin can't cast a vote");
 
         // check if voter has voted or not
-        require(!voterData[msg.sender].voted, "voter already casted his vote");
+        require(!voterData[msg.sender].voted, "Voter already casted his vote");
         
         // check if candidate is of respective consituency
         if(candidateData[_candidateId].consituencyId == _consituencyId) {

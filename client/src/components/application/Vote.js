@@ -33,7 +33,7 @@ class Vote extends Component {
       .get(endpoint + "/api/v1/getVoterList/" + this.state.contractAddress)
       .then(res => {
         let arr = res.data;
-        console.log(res.data);
+        // console.log(res.data);
         this.setState({
           voterList: arr.map(arr => ({
             key: arr.voterId,
@@ -49,58 +49,56 @@ class Vote extends Component {
     this.setState({
       [name]: value
     });
-    console.log(result.value, result.name);
+    // console.log(result.value, result.name);
     // get voters consituency
 
     if (result.name === "voter") {
-      await axios
-        .get(endpoint + "/api/v1/getVoter/" + this.state.contractAddress, {
+      const voters = await axios.get(
+        endpoint + "/api/v1/getVoter/" + this.state.contractAddress,
+        {
           params: {
             voterId: result.value
           }
-        })
-        .then(res => {
-          console.log(res, "cons id");
-          this.setState({
-            consituencyId: parseInt(res.data.consituencyId)
-          });
-        });
-      await axios
-        .get(
-          endpoint +
-            "/api/v1/getVoterConsituencyCandidates/" +
-            this.state.contractAddress,
-          {
-            params: {
-              voterId: result.value,
-              consituencyId: this.state.consituencyId
-            }
+        }
+      );
+      // console.log(voters, "cons id");
+      this.setState({
+        consituencyId: parseInt(voters.data.consituencyId)
+      });
+
+      const votersCandidates = await axios.get(
+        endpoint +
+          "/api/v1/getVoterConsituencyCandidates/" +
+          this.state.contractAddress,
+        {
+          params: {
+            voterId: result.value,
+            consituencyId: this.state.consituencyId
           }
-        )
-        .then(async res => {
-          console.log("res", this.state.consituencyId);
-          let candidateList = res.data.candidateList.map(candidateId =>
-            axios
-              .get(
-                endpoint + "/api/v1/getCandidate/" + this.state.contractAddress,
-                {
-                  params: { candidateId: candidateId }
-                }
-              )
-              .then(res => {
-                return res.data;
-              })
-          );
-          candidateList = await Promise.all(candidateList);
-          console.log("candidates", candidateList);
-          this.setState({
-            candidateList: candidateList.map(candidate => ({
-              key: candidate.candidateId,
-              text: `${candidate.party} | ${candidate.name}`,
-              value: candidate.candidateId
-            }))
-          });
-        });
+        }
+      );
+      // console.log("res", this.state.consituencyId);
+      let candidateList = votersCandidates.data.candidateList.map(candidateId =>
+        axios
+          .get(
+            endpoint + "/api/v1/getCandidate/" + this.state.contractAddress,
+            {
+              params: { candidateId: candidateId }
+            }
+          )
+          .then(res => {
+            return res.data;
+          })
+      );
+      candidateList = await Promise.all(candidateList);
+      // console.log("candidates", candidateList);
+      this.setState({
+        candidateList: candidateList.map(candidate => ({
+          key: candidate.candidateId,
+          text: `${candidate.party} | ${candidate.name}`,
+          value: candidate.candidateId
+        }))
+      });
     }
   }
 
@@ -112,12 +110,16 @@ class Vote extends Component {
         candidateId: this.state.candidate
       })
       .then(res => {
-        console.log(res);
-        this.setState({
-          message: `Vote casted Successfully!\n TxHash: ${
-            res.data.transactionHash
-          }`
-        });
+        // console.log(res);
+        if (res.data.status)
+          this.setState({
+            message: `${res.data.message}! TxHash: ${res.data.transactionHash}`
+          });
+        else {
+          this.setState({
+            message: `${res.data.message}! `
+          });
+        }
       });
   }
 

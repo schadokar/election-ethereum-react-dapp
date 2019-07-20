@@ -56,6 +56,14 @@ Admin can't be a voter or a candidate.
 
 Compile and Deploy the Election Factory from the home page. http://localhost:3000
 
+Click on Compile to compile the contract.
+
+![](images\compile.PNG)
+
+Click on Deploy to deploy the contract.
+
+![](images\deploy.PNG)
+
 ### Step 2:
 
 Create new Election. Pass duration of election in mins and Name of the election.

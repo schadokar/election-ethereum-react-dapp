@@ -33,13 +33,10 @@ class RegisterVoter extends Component {
     await this.setState({
       contractAddress: url.split("/")[url.split("/").length - 1]
     });
-    // console.log(url.split("/")[url.split("/").length - 1]);
 
     // get the ethereum accounts
     axios.get(endpoint + "/api/v1/accounts").then(res => {
-      // console.log(res);
       let arr = res.data;
-      //  console.log(typeof arr, arr);
       this.setState({
         accounts: arr.map((arr, index) => ({
           key: index,
@@ -47,7 +44,6 @@ class RegisterVoter extends Component {
           value: arr
         }))
       });
-      // console.log(this.state.accounts);
     });
 
     // get the available consituency List
@@ -86,12 +82,16 @@ class RegisterVoter extends Component {
         age: this.state.voterAge
       })
       .then(res => {
-        console.log(res);
-        this.setState({
-          message: `Voter successfully added! TxHash: ${
-            res.data.transactionHash
-          }`
-        });
+        // console.log(res);
+        if (res.data.status)
+          this.setState({
+            message: `${res.data.message}! TxHash: ${res.data.transactionHash}`
+          });
+        else {
+          this.setState({
+            message: `${res.data.message}! `
+          });
+        }
       });
   }
 
