@@ -38,11 +38,19 @@ From Project Root Directory
 
 #### Terminal 1: ganache-cli
 
-#### Terminal 2: npm run dev
+#### Terminal 2: 
+- Step 1: Compile the contract. It will compile and create the binary in the build folder.
+```
+cd ethereum
+node compile.js
+```
 
-From Client Directory
+- Step 2: Run the server
+```
+npm run dev
+```
 
-#### Terminal 3: npm start
+#### Terminal 3: cd client && npm start
 
 ## Election
 
