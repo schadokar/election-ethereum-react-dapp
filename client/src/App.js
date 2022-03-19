@@ -1,40 +1,49 @@
-import React, { Component } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import { Container } from "semantic-ui-react";
-import Header from "../src/components/layout/Header";
-import CreateElection from "./components/application/Create-Election";
-import Election from "../src/components/application/Election";
-import Voters from "../src/components/application/Voters";
-import Candidates from "../src/components/application/Candidates";
-import RegisterVoter from "../src/components/application/Register-Voter";
-import RegisterCandidate from "../src/components/application/Register-Candidate";
-import Vote from "../src/components/application/Vote";
-import Result from "../src/components/application/Result";
-import "./App.css";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Container, Segment } from "semantic-ui-react";
 
-class App extends Component {
-  render() {
-    return (
-      <div className="container">
-        <Container>
-          <Header />
+import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
+
+import {
+  Candidates,
+  CreateElection,
+  Election,
+  RegisterCandidate,
+  RegisterVoter,
+  Result,
+  Vote,
+  Voters,
+} from "./components/application/index";
+
+function App() {
+  return (
+    <div className="container">
+      <Container>
+        <Header />
+        <Segment>
           <Router>
-            <Route exact path="/" component={CreateElection} />
-            <Route path="/election" component={Election} />
-            <Route path="/voterRegistration" component={RegisterVoter} />
-            <Route
-              path="/candidateRegistration"
-              component={RegisterCandidate}
-            />
-            <Route path="/vote" component={Vote} />
-            <Route path="/result" component={Result} />
-            <Route path="/voters" component={Voters} />
-            <Route path="/candidates" component={Candidates} />
+            <Routes>
+              <Route exact path="/" element={<CreateElection />} />
+              <Route path="/election/:address" element={<Election />} />
+              <Route
+                path="/voterRegistration/:address"
+                element={<RegisterVoter />}
+              />
+              <Route
+                path="/candidateRegistration/:address"
+                element={<RegisterCandidate />}
+              />
+              <Route path="/vote/:address" element={<Vote />} />
+              <Route path="/result/:address" element={<Result />} />
+              <Route path="/voters/:address" element={<Voters />} />
+              <Route path="/candidates/:address" element={<Candidates />} />
+            </Routes>
           </Router>
-        </Container>
-      </div>
-    );
-  }
+        </Segment>
+        <Footer />
+      </Container>
+    </div>
+  );
 }
 
 export default App;

@@ -17,7 +17,8 @@ class CreateElection extends Component {
       items: [],
       loading: false,
       loadingDeploy: false,
-      loadingCompile: false
+      loadingCompile: false,
+      messageType: "info",
     };
 
     this.onChange = this.onChange.bind(this);
@@ -38,17 +39,18 @@ class CreateElection extends Component {
         .post(endpoint + "/api/v1/newElection", {
           account: this.state.accountIndex,
           duration: parseInt(this.state.duration),
-          electionName: this.state.electionName
+          electionName: this.state.electionName,
         })
-        .then(res => {
+        .then((res) => {
           console.log("------------", res);
           this.setState({
             message: `Transaction Hash: ${res.data.transactionHash}`,
-            loading: false
+            messageType: "info",
+            loading: false,
           });
           this.getElectionList();
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         });
     } catch (error) {
@@ -58,30 +60,38 @@ class CreateElection extends Component {
 
   compile() {
     this.setState({ loadingCompile: true });
-    axios.post(endpoint + "/contract/compile").then(res => {
+    axios.post(endpoint + "/contract/compile").then((res) => {
       console.log(res.data);
       this.setState({
         message: res.data,
-        loadingCompile: false
+        messageType: "info",
+        loadingCompile: false,
       });
     });
   }
 
   deploy() {
     this.setState({ loadingDeploy: true });
-    axios.post(endpoint + "/contract/deploy").then(res => {
+    axios.post(endpoint + "/contract/deploy").then((res) => {
       console.log(res.data);
-      this.setState({
-        message: `Contract deployed Successfully! Address: ${res.data.address}`,
-        loadingDeploy: false,
-        electionList: []
-      });
+      this.setState(
+        {
+          message: `Contract deployed Successfully! Address: ${res.data.address}`,
+          messageType: "info",
+          loadingDeploy: false,
+          electionList: [],
+        },
+        () => {
+          this.getElectionList();
+        }
+      );
     });
   }
 
   message() {
     if (this.state.message.length) {
-      return <Message info>{this.state.message}</Message>;
+      const type = this.state.messageType;
+      return <Message color={type}>{this.state.message}</Message>;
     }
   }
   componentDidMount() {
@@ -89,11 +99,11 @@ class CreateElection extends Component {
   }
 
   getElectionList() {
-    axios.get(endpoint + "/api/v1/getElections").then(res => {
+    axios.get(endpoint + "/api/v1/getElections").then((res) => {
       console.log(res.data);
       this.setState({
         electionList: res.data,
-        items: res.data.reverse().map(election => {
+        items: res.data.reverse().map((election) => {
           // console.log("--->", election);
           let card = {
             header: election.electionName,
@@ -103,10 +113,10 @@ class CreateElection extends Component {
               </a>
             ),
             meta: `Election Address: ${election.electionAddress}`,
-            fluid: true
+            fluid: true,
           };
           return card;
-        })
+        }),
       });
     });
   }
@@ -135,7 +145,7 @@ class CreateElection extends Component {
             <Input
               label="minutes"
               labelPosition="right"
-              type="text"
+              type="number"
               name="duration"
               value={this.state.duration}
               onChange={this.onChange}

@@ -6,7 +6,7 @@ const ElectionHeader = () => {
   return (
     <div className="header">
       <Header as="a" href="/">
-        <h2>Voting Project</h2>
+        <h2>Voting on Blockchain</h2>
       </Header>
     </div>
   );

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { Message, Button, Table, Card } from "semantic-ui-react";
 import ElectionHeader from "../layout/Election-Header";
+import withRouter from "./withRouter";
 
 const endpoint = "http://localhost:4000";
 
@@ -19,7 +20,7 @@ class Result extends Component {
       partyConsituencyCount: [],
       winningParty: "",
       maxConsituencyWin: 0,
-      partyCountCard: false
+      partyCountCard: false,
     };
 
     this.closeElection = this.closeElection.bind(this);
@@ -28,16 +29,15 @@ class Result extends Component {
 
   async componentDidMount() {
     // get the contract address from the url
-    const url = window.location.href;
     await this.setState({
-      contractAddress: url.split("/")[url.split("/").length - 1]
+      contractAddress: this.props.params.address,
     });
 
     axios
       .get(endpoint + "/api/v1/getElectionAdmin/" + this.state.contractAddress)
-      .then(res => {
+      .then((res) => {
         this.setState({
-          admin: res.data
+          admin: res.data,
         });
         // console.log("admin", res.data);
       });
@@ -47,16 +47,16 @@ class Result extends Component {
   closeElection() {
     axios
       .post(endpoint + "/api/v1/closeElection/" + this.state.contractAddress, {
-        account: this.state.admin
+        account: this.state.admin,
       })
-      .then(res => {
+      .then((res) => {
         if (res.data.status)
           this.setState({
-            message: `${res.data.message}! TxHash: ${res.data.transactionHash}`
+            message: `${res.data.message}! TxHash: ${res.data.transactionHash}`,
           });
         else {
           this.setState({
-            message: `${res.data.message}! `
+            message: `${res.data.message}! `,
           });
         }
       });
@@ -66,46 +66,44 @@ class Result extends Component {
   electionResult() {
     axios
       .get(endpoint + "/api/v1/electionData/" + this.state.contractAddress)
-      .then(res => {
+      .then((res) => {
         console.log(res);
         // let partyData = res.data[1];
         this.setState({
-          winnerList: res.data.map(winner => ({
+          winnerList: res.data.map((winner) => ({
             consituencyId: winner.consituencyId,
             consituencyName: winner.consituencyName,
             candidateId: winner.candidateId,
             candidateName: winner.candidateName,
             votes: winner.votes,
-            candidateParty: winner.candidateParty
+            candidateParty: winner.candidateParty,
           })),
-          winnerTable: true
+          winnerTable: true,
         });
       });
 
     axios
       .get(endpoint + "/api/v1/electionResult/" + this.state.contractAddress)
-      .then(res => {
+      .then((res) => {
         console.log("-->", res);
 
         this.setState({
-          partyConsituencyCount: res.data[0].map(obj => ({
+          partyConsituencyCount: res.data[0].map((obj) => ({
             party: obj.party,
             seats: obj.count,
-            index: obj.index
+            index: obj.index,
           })),
           partyCountCard: true,
-          message: `Result of the election is ${
-            res.data[1]
-          } won maximum consituencies with count ${res.data[2]}`
+          message: `Result of the election is ${res.data[1]} won maximum consituencies with count ${res.data[2]}`,
         });
       });
   }
 
   partyConsituencyCount() {
     if (this.state.partyCountCard) {
-      let items = this.state.partyConsituencyCount.map(partyObj => ({
+      let items = this.state.partyConsituencyCount.map((partyObj) => ({
         header: partyObj.party,
-        description: `Consituency Win Count: ${partyObj.seats}`
+        description: `Consituency Win Count: ${partyObj.seats}`,
       }));
       return <Card.Group items={items} />;
     }
@@ -167,4 +165,4 @@ class Result extends Component {
   }
 }
 
-export default Result;
+export default withRouter(Result);

@@ -14,7 +14,7 @@ class ElectionHeader extends Component {
       account: "",
       consituency: "",
       message: "",
-      voterRoute: ""
+      voterRoute: "",
     };
   }
 
@@ -24,21 +24,21 @@ class ElectionHeader extends Component {
     // set the contract address from the url
     const url = window.location.href;
     await this.setState({
-      contractAddress: url.split("/")[url.split("/").length - 1]
+      contractAddress: url.split("/")[url.split("/").length - 1],
     });
 
     // get the admin of the election
 
     axios
       .get(endpoint + "/api/v1/getElectionAdmin/" + this.state.contractAddress)
-      .then(res => {
+      .then((res) => {
         console.log(res);
         this.setState({ admin: res.data });
       });
 
     axios
       .get(endpoint + "/api/v1/getElectionName/" + this.state.contractAddress)
-      .then(res => {
+      .then((res) => {
         console.log(res);
         this.setState({ contractName: res.data });
       });
@@ -50,9 +50,7 @@ class ElectionHeader extends Component {
         <Menu>
           <Menu.Item
             header
-            href={`http://localhost:3000/Election/${
-              this.state.contractAddress
-            }`}
+            href={`http://localhost:3000/Election/${this.state.contractAddress}`}
           >
             <h3>Election</h3>
           </Menu.Item>
@@ -72,9 +70,7 @@ class ElectionHeader extends Component {
           />
 
           <Menu.Item
-            href={`http://localhost:3000/candidates/${
-              this.state.contractAddress
-            }`}
+            href={`http://localhost:3000/candidates/${this.state.contractAddress}`}
             name="Candidates"
             active={this.state.activeItem === "Candidates"}
             onClick={this.handleItemClick}
@@ -86,17 +82,13 @@ class ElectionHeader extends Component {
             onClick={this.handleItemClick}
           />
           <Menu.Item
-            href={`http://localhost:3000/voterRegistration/${
-              this.state.contractAddress
-            }`}
+            href={`http://localhost:3000/voterRegistration/${this.state.contractAddress}`}
             name="RegisterVoter"
             active={this.state.activeItem === "RegisterVoter"}
             onClick={this.handleItemClick}
           />
           <Menu.Item
-            href={`http://localhost:3000/candidateRegistration/${
-              this.state.contractAddress
-            }`}
+            href={`http://localhost:3000/candidateRegistration/${this.state.contractAddress}`}
             name="RegisterCandidate"
             active={this.state.activeItem === "RegisterCandidate"}
             onClick={this.handleItemClick}

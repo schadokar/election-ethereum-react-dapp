@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Form, Button, Message, Table } from "semantic-ui-react";
 import axios from "axios";
 import ElectionHeader from "../layout/Election-Header";
-
+import withRouter from "./withRouter";
 const endpoint = "http://localhost:4000";
 
 class Election extends Component {
@@ -13,42 +13,42 @@ class Election extends Component {
       contractAddress: "",
       consituencyList: [],
       account: "",
-      consituencyId: "",
+      consituencyId: 0,
       consituencyName: "",
-      message: ""
+      message: "",
     };
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
 
-  async componentDidMount() {
+  componentDidMount = async () => {
     // set the contract address from the url
-    const url = window.location.href;
     await this.setState({
-      contractAddress: url.split("/")[url.split("/").length - 1]
+      contractAddress: this.props.params.address,
     });
 
     axios
       .get(
         endpoint + "/api/v1/getConsituencyList/" + this.state.contractAddress
       )
-      .then(res => {
+      .then((res) => {
         console.log("Consituency: ", res.data);
         this.setState({
-          consituencyList: res.data.map(consituency => ({
+          consituencyId: res.data.length + 1,
+          consituencyList: res.data.map((consituency) => ({
             consituencyId: consituency.consituencyId,
-            consituencyName: consituency.name
-          }))
+            consituencyName: consituency.name,
+          })),
         });
       });
-  }
+  };
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
   onChange(event) {
     this.setState({
-      [event.target.name]: event.target.value
+      [event.target.name]: event.target.value,
     });
   }
 
@@ -58,17 +58,17 @@ class Election extends Component {
       {
         account: 0,
         consituencyId: this.state.consituencyId,
-        consituencyName: this.state.consituencyName
+        consituencyName: this.state.consituencyName,
       }
     );
     console.log(res);
     if (res.data.status)
       this.setState({
-        message: `${res.data.message}! TxHash: ${res.data.transactionHash}`
+        message: `${res.data.message}! TxHash: ${res.data.transactionHash}`,
       });
     else {
       this.setState({
-        message: `${res.data.message}! `
+        message: `${res.data.message}! `,
       });
     }
 
@@ -77,10 +77,11 @@ class Election extends Component {
     );
 
     this.setState({
-      consituencyList: consituencyList.data.map(consituency => ({
+      consituencyId: consituencyList.data.length + 1,
+      consituencyList: consituencyList.data.map((consituency) => ({
         consituencyId: consituency.consituencyId,
-        consituencyName: consituency.name
-      }))
+        consituencyName: consituency.name,
+      })),
     });
   }
 
@@ -111,6 +112,7 @@ class Election extends Component {
       );
     }
   }
+
   consituencyBody() {
     const { Row, Cell } = Table;
     return this.state.consituencyList.map((consituency, index) => {
@@ -131,10 +133,10 @@ class Election extends Component {
           <Form.Field>
             <label>Add Consituency</label>
             <input
+              readOnly
               placeholder="Consituency ID"
-              type="text"
+              type="number"
               name="consituencyId"
-              onChange={this.onChange}
               value={this.state.consituencyId}
             />
           </Form.Field>
@@ -160,4 +162,4 @@ class Election extends Component {
   }
 }
 
-export default Election;
+export default withRouter(Election);

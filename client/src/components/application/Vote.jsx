@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Form, Dropdown, Button, Message } from "semantic-ui-react";
 import axios from "axios";
 import ElectionHeader from "../layout/Election-Header";
+import withRouter from "./withRouter";
 
 const endpoint = "http://localhost:4000";
 
@@ -15,7 +16,7 @@ class Vote extends Component {
       voter: "",
       candidate: "",
       consituencyId: "",
-      message: ""
+      message: "",
     };
     this.handleChange = this.handleChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -23,23 +24,22 @@ class Vote extends Component {
 
   async componentDidMount() {
     // get contract address from URL
-    const url = window.location.href;
     await this.setState({
-      contractAddress: url.split("/")[url.split("/").length - 1]
+      contractAddress: this.props.params.address,
     });
 
     // fetch all voters
     axios
       .get(endpoint + "/api/v1/getVoterList/" + this.state.contractAddress)
-      .then(res => {
+      .then((res) => {
         let arr = res.data;
         // console.log(res.data);
         this.setState({
-          voterList: arr.map(arr => ({
+          voterList: arr.map((arr) => ({
             key: arr.voterId,
             text: arr.name,
-            value: arr.voterId
-          }))
+            value: arr.voterId,
+          })),
         });
       });
   }
@@ -47,7 +47,7 @@ class Vote extends Component {
   async handleChange(e, result) {
     const { name, value } = result;
     this.setState({
-      [name]: value
+      [name]: value,
     });
     // console.log(result.value, result.name);
     // get voters consituency
@@ -57,13 +57,13 @@ class Vote extends Component {
         endpoint + "/api/v1/getVoter/" + this.state.contractAddress,
         {
           params: {
-            voterId: result.value
-          }
+            voterId: result.value,
+          },
         }
       );
       // console.log(voters, "cons id");
       this.setState({
-        consituencyId: parseInt(voters.data.consituencyId)
+        consituencyId: parseInt(voters.data.consituencyId),
       });
 
       const votersCandidates = await axios.get(
@@ -73,31 +73,32 @@ class Vote extends Component {
         {
           params: {
             voterId: result.value,
-            consituencyId: this.state.consituencyId
-          }
+            consituencyId: this.state.consituencyId,
+          },
         }
       );
       // console.log("res", this.state.consituencyId);
-      let candidateList = votersCandidates.data.candidateList.map(candidateId =>
-        axios
-          .get(
-            endpoint + "/api/v1/getCandidate/" + this.state.contractAddress,
-            {
-              params: { candidateId: candidateId }
-            }
-          )
-          .then(res => {
-            return res.data;
-          })
+      let candidateList = votersCandidates.data.candidateList.map(
+        (candidateId) =>
+          axios
+            .get(
+              endpoint + "/api/v1/getCandidate/" + this.state.contractAddress,
+              {
+                params: { candidateId: candidateId },
+              }
+            )
+            .then((res) => {
+              return res.data;
+            })
       );
       candidateList = await Promise.all(candidateList);
       // console.log("candidates", candidateList);
       this.setState({
-        candidateList: candidateList.map(candidate => ({
+        candidateList: candidateList.map((candidate) => ({
           key: candidate.candidateId,
           text: `${candidate.party} | ${candidate.name}`,
-          value: candidate.candidateId
-        }))
+          value: candidate.candidateId,
+        })),
       });
     }
   }
@@ -107,17 +108,17 @@ class Vote extends Component {
       .post(endpoint + "/api/v1/castVote/" + this.state.contractAddress, {
         voterId: this.state.voter,
         consituencyId: this.state.consituencyId,
-        candidateId: this.state.candidate
+        candidateId: this.state.candidate,
       })
-      .then(res => {
+      .then((res) => {
         // console.log(res);
         if (res.data.status)
           this.setState({
-            message: `${res.data.message}! TxHash: ${res.data.transactionHash}`
+            message: `${res.data.message}! TxHash: ${res.data.transactionHash}`,
           });
         else {
           this.setState({
-            message: `${res.data.message}! `
+            message: `${res.data.message}! `,
           });
         }
       });
@@ -171,4 +172,4 @@ class Vote extends Component {
   }
 }
 
-export default Vote;
+export default withRouter(Vote);

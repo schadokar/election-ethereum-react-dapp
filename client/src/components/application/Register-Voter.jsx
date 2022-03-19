@@ -2,51 +2,48 @@ import React, { Component } from "react";
 import { Form, Button, Dropdown, Message } from "semantic-ui-react";
 import axios from "axios";
 import ElectionHeader from "../layout/Election-Header";
+import withRouter from "./withRouter";
 
 const endpoint = "http://localhost:4000";
 
-class RegisterCandidate extends Component {
+class RegisterVoter extends Component {
   constructor(props) {
     super(props);
     this.state = {
       admin: "",
       accounts: [],
       consituencyList: [],
-      candidateParty: "",
       contractAddress: "",
-      candidateAddress: "",
-      candidateName: "",
-      candidateEmail: "",
-      candidatePhone: "",
-      candidateConsituency: "",
+      voterAddress: "",
+      voterName: "",
+      voterEmail: "",
+      voterPhone: "",
+      voterConsituency: "",
+      voterAge: "",
       message: "",
-      value: ""
+      value: "",
     };
+
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-    // this.handleChange = this.handleChange.bind(this);
   }
 
   async componentDidMount() {
     // set the contract address from the url
-    const url = window.location.href;
     await this.setState({
-      contractAddress: url.split("/")[url.split("/").length - 1]
+      contractAddress: this.props.params.address,
     });
 
     // get the ethereum accounts
-    axios.get(endpoint + "/api/v1/accounts").then(res => {
-      // console.log(res);
+    axios.get(endpoint + "/api/v1/accounts").then((res) => {
       let arr = res.data;
-      //  console.log(typeof arr, arr);
       this.setState({
         accounts: arr.map((arr, index) => ({
           key: index,
           text: arr,
-          value: arr
-        }))
+          value: arr,
+        })),
       });
-      // console.log(this.state.accounts);
     });
 
     // get the available consituency List
@@ -54,59 +51,54 @@ class RegisterCandidate extends Component {
       .get(
         endpoint + "/api/v1/getConsituencyList/" + this.state.contractAddress
       )
-      .then(res => {
-        //  console.log(res);
+      .then((res) => {
+        console.log(res);
         let arr = res.data;
         this.setState({
-          consituencyList: arr.map(arr => ({
+          consituencyList: arr.map((arr) => ({
             key: arr.consituencyId,
             text: `${arr.consituencyId} | ${arr.name}`,
-            value: arr.consituencyId
-          }))
+            value: arr.consituencyId,
+          })),
         });
       });
   }
 
   onChange(event) {
     this.setState({
-      [event.target.name]: event.target.value
+      [event.target.name]: event.target.value,
     });
   }
 
   onSubmit() {
     axios
-      .post(endpoint + "/api/v1/addCandidate/" + this.state.contractAddress, {
+      .post(endpoint + "/api/v1/addVoter/" + this.state.contractAddress, {
         account: this.state.admin,
-        candidateId: this.state.candidateAddress,
-        name: this.state.candidateName,
-        email: this.state.candidateEmail,
-        phoneNo: this.state.candidatePhone,
-        consituency: this.state.candidateConsituency,
-        party: this.state.candidateParty
+        voterId: this.state.voterAddress,
+        name: this.state.voterName,
+        email: this.state.voterEmail,
+        phoneNo: this.state.voterPhone,
+        consituency: this.state.voterConsituency,
+        age: this.state.voterAge,
       })
-      .then(res => {
-        console.log(res);
+      .then((res) => {
+        // console.log(res);
         if (res.data.status)
           this.setState({
-            message: `${res.data.message}! TxHash: ${res.data.transactionHash}`
+            message: `${res.data.message}! TxHash: ${res.data.transactionHash}`,
           });
         else {
           this.setState({
-            message: `${res.data.message}! `
+            message: `${res.data.message}! `,
           });
         }
-      })
-      .catch(err => {
-        console.error("status:", err.status);
-        console.error("info:", err.message);
-        console.error("error:", err.error);
       });
   }
 
   handleChange = (e, result) => {
     const { name, value } = result;
     this.setState({
-      [name]: value
+      [name]: value,
     });
 
     console.log(result.value, result.name);
@@ -129,76 +121,79 @@ class RegisterCandidate extends Component {
             value={this.state.admin}
           />
           <Form.Field
-            placeholder="Candidate Id"
-            name="candidateAddress"
-            label="Candidate Id"
+            placeholder="Voter ID"
+            name="voterAddress"
+            label="Voter ID"
             control={Dropdown}
             fluid
             selection
             onChange={this.handleChange}
             options={this.state.accounts}
-            value={this.state.candidateAddress}
+            value={this.state.voterAddress}
           />
-          <Form.Field>
-            <label>Party</label>
-            <input
-              placeholder="Candidate Party"
-              type="text"
-              name="candidateParty"
-              onChange={this.onChange}
-              value={this.state.candidateParty}
-            />
-          </Form.Field>
           <Form.Field>
             <label>Name</label>
             <input
-              placeholder="Candidate Name"
+              placeholder="voter Name"
               type="text"
-              name="candidateName"
+              name="voterName"
               onChange={this.onChange}
-              value={this.state.candidateName}
+              value={this.state.voterName}
             />
           </Form.Field>
           <Form.Field>
             <label>Email</label>
             <input
-              placeholder="Candidate Email"
+              placeholder="voter Email"
               type="text"
-              name="candidateEmail"
+              name="voterEmail"
               onChange={this.onChange}
-              value={this.state.candidateEmail}
+              value={this.state.voterEmail}
             />
           </Form.Field>
           <Form.Field>
             <label>Phone no.</label>
             <input
-              placeholder="Candidate Phone"
+              placeholder="voter Phone"
               type="text"
-              name="candidatePhone"
+              name="voterPhone"
               onChange={this.onChange}
-              value={this.state.candidatePhone}
+              value={this.state.voterPhone}
             />
           </Form.Field>
           <Form.Field
             label="Consituency"
-            placeholder="Candidate Consituency"
+            placeholder="Voter Consituency"
             control={Dropdown}
             fluid
             selection
-            name="candidateConsituency"
+            name="voterConsituency"
             onChange={this.handleChange}
             options={this.state.consituencyList}
-            value={this.state.candidateConsituency}
+            value={this.state.voterConsituency}
           />
-
+          <Form.Field>
+            <label>Age</label>
+            <input
+              placeholder="voter age"
+              type="text"
+              name="voterAge"
+              onChange={this.onChange}
+              value={this.state.voterAge}
+            />
+          </Form.Field>
           <Button primary type="submit" onClick={this.onSubmit}>
             Register
           </Button>
-          <Message info header="Message" content={this.state.message} />
         </Form>
+        <Message info>
+          <Message.Header>
+            <p>{this.state.message}</p>
+          </Message.Header>
+        </Message>
       </div>
     );
   }
 }
 
-export default RegisterCandidate;
+export default withRouter(RegisterVoter);
