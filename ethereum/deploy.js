@@ -1,7 +1,6 @@
 const fs = require("fs-extra");
 const path = require("path");
 const { web3, web3Network } = require("./web3");
-const compiledContract = require("./build/ElectionFactory.json");
 // const jsonfile = require('jsonfile');
 const circularJSON = require("circular-json");
 
@@ -25,11 +24,17 @@ const deploy = async () => {
     const accounts = await web3.eth.getAccounts();
     console.log("Attempting to deploy from account", accounts[0]);
 
+    const compiledContract = JSON.parse(
+      fs.readFileSync(
+        path.resolve(__dirname, "build", "ElectionFactory.json"),
+        "utf8"
+      )
+    );
     const result = await new web3.eth.Contract(
       JSON.parse(compiledContract.interface)
     )
       .deploy({
-        data: compiledContract.bytecode
+        data: compiledContract.bytecode,
       })
       .send({ gas: 4050000, from: accounts[0] });
 

@@ -1,17 +1,31 @@
 const fs = require("fs-extra");
 const { web3, web3Network } = require("./web3");
-const compileFactoryContract = require("./build/ElectionFactory.json");
-const compileContract = require("./build/Election.json");
-
+const path = require("path");
 // Contract object deployed on network (ganache-cli or testnet or mainnet)
 // network can be selected in web3 file
 const getFactoryObject = () => {
   try {
+    const compileFactoryContract = JSON.parse(
+      fs.readFileSync(
+        path.resolve(__dirname, "build", "ElectionFactory.json"),
+        "utf8"
+      )
+    );
     let contractReceipt;
     if (web3Network == "ganache") {
-      contractReceipt = require("./receipt-ganache.json");
+      contractReceipt = JSON.parse(
+        fs.readFileSync(
+          path.resolve(__dirname, "./receipt-ganache.json"),
+          "utf8"
+        )
+      );
     } else if (web3Network == "rinkeby") {
-      contractReceipt = require("./receipt-rinkeby.json");
+      contractReceipt = JSON.parse(
+        fs.readFileSync(
+          path.resolve(__dirname, "./receipt-rinkeby.json"),
+          "utf8"
+        )
+      );
     }
 
     const contractObject = new web3.eth.Contract(
@@ -66,7 +80,7 @@ const getConductedElections = async () => {
         .call({ from: accounts[0] });
       result.push({
         electionAddress: elections[i],
-        electionName: electionName
+        electionName: electionName,
       });
     }
 
@@ -78,7 +92,7 @@ const getConductedElections = async () => {
   }
 };
 
-const getElectionAddress = async index => {
+const getElectionAddress = async (index) => {
   try {
     const elections = await getConductedElections();
 
@@ -89,8 +103,11 @@ const getElectionAddress = async index => {
   }
 };
 
-const getContractObject = address => {
+const getContractObject = (address) => {
   try {
+    const compileContract = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, "./build/Election.json"), "utf8")
+    );
     const contractObject = new web3.eth.Contract(
       JSON.parse(compileContract.interface),
       address
@@ -103,7 +120,7 @@ const getContractObject = address => {
   }
 };
 
-const getElectionAdmin = async address => {
+const getElectionAdmin = async (address) => {
   try {
     const contractObject = getContractObject(address);
     const accounts = await web3.eth.getAccounts();
@@ -118,7 +135,7 @@ const getElectionAdmin = async address => {
   }
 };
 
-const getElectionName = async address => {
+const getElectionName = async (address) => {
   try {
     const contractObject = getContractObject(address);
     const accounts = await web3.eth.getAccounts();
@@ -158,7 +175,7 @@ const addConsituency = async (account, address, consituencyId, name) => {
 };
 
 // get all the added consituency
-const getConsituencyList = async address => {
+const getConsituencyList = async (address) => {
   try {
     const contractObject = getContractObject(address);
     const accounts = await web3.eth.getAccounts();
@@ -166,7 +183,7 @@ const getConsituencyList = async address => {
       .getConsituencyIdList()
       .call({ from: accounts[0] });
     // console.log(consituencyIdList);
-    const consituencyList = await consituencyIdList.map(consituencyId =>
+    const consituencyList = await consituencyIdList.map((consituencyId) =>
       getConsituency(address, consituencyId)
     );
     let result = await Promise.all(consituencyList);
@@ -226,7 +243,7 @@ const addVoter = async (
   }
 };
 
-const getVoterList = async address => {
+const getVoterList = async (address) => {
   try {
     const contractObject = getContractObject(address);
     const accounts = await web3.eth.getAccounts();
@@ -234,7 +251,7 @@ const getVoterList = async address => {
       .getVotersIdList()
       .call({ from: accounts[0] });
     console.log("logic: get voter list:", votersIdList);
-    const votersList = await votersIdList.map(voter =>
+    const votersList = await votersIdList.map((voter) =>
       getVoter(address, voter)
     );
 
@@ -284,7 +301,7 @@ const addCandidate = async (
 
     if (consituencyCandidates.length) {
       await Promise.all(
-        consituencyCandidates.map(async obj => {
+        consituencyCandidates.map(async (obj) => {
           const candidate = await getCandidate(address, obj);
           console.log(obj, "----<>");
           if (candidate.party == party.toUpperCase()) {
@@ -327,7 +344,7 @@ const addCandidate = async (
   }
 };
 
-const getCandidateList = async address => {
+const getCandidateList = async (address) => {
   try {
     const contractObject = getContractObject(address);
     const accounts = await web3.eth.getAccounts();
@@ -336,7 +353,7 @@ const getCandidateList = async address => {
       .getCandidatesIdList()
       .call({ from: accounts[0] });
 
-    const candidateList = await candidateIdList.map(candidateId =>
+    const candidateList = await candidateIdList.map((candidateId) =>
       getCandidate(address, candidateId)
     );
     // console.log(candidateList);
@@ -399,7 +416,7 @@ const getVoterConsituencyCandidates = async (
 
     let result = {
       consituencyId: consituencyId,
-      candidateList: candidateList
+      candidateList: candidateList,
     };
     return result;
   } catch (error) {
@@ -476,24 +493,24 @@ const closeElection = async (address, account) => {
   }
 };
 
-const electionData = async address => {
+const electionData = async (address) => {
   try {
     const accounts = await web3.eth.getAccounts();
 
     const consituencyList = await getConsituencyList(address);
 
-    const consituencyIdList = consituencyList.map(consituency =>
+    const consituencyIdList = consituencyList.map((consituency) =>
       parseInt(consituency.consituencyId)
     );
 
     const consituencyCandidateList = await Promise.all(
-      consituencyIdList.map(async consituencyId => ({
+      consituencyIdList.map(async (consituencyId) => ({
         consituencyId: consituencyId,
         candidateList: await getConsituencyCandidates(
           address,
           accounts[0],
           consituencyId
-        )
+        ),
       }))
     );
     // console.log(consituencyCandidateList);
@@ -501,7 +518,7 @@ const electionData = async address => {
       consituencyCandidateList.map(
         async ({ consituencyId, candidateList }) =>
           await Promise.all(
-            candidateList.map(async candidateId => {
+            candidateList.map(async (candidateId) => {
               const candidate = await getCandidate(address, candidateId);
               const consituency = await getConsituency(address, consituencyId);
               return {
@@ -514,7 +531,7 @@ const electionData = async address => {
                   address,
                   consituencyId,
                   candidateId
-                )
+                ),
               };
             })
           )
@@ -531,37 +548,37 @@ const electionData = async address => {
   }
 };
 
-const electionResult = async address => {
+const electionResult = async (address) => {
   try {
     // get all the election data, candidate vote count
     const electionDataArr = await electionData(address);
     // get all the consituency list names
     const consituencyList = [
-      ...new Set(electionDataArr.map(obj => obj.consituencyId))
+      ...new Set(electionDataArr.map((obj) => obj.consituencyId)),
     ];
     //console.log(consituencyList);
 
     // Initiate the partyCount with object (party, seat count, index)
     let partyCount = [
-      ...new Set(electionDataArr.map(obj => obj.candidateParty))
+      ...new Set(electionDataArr.map((obj) => obj.candidateParty)),
     ].map((party, index) => ({
       party: party,
       count: 0,
-      index: index
+      index: index,
     }));
     //console.log(partyCount);
 
     // who won the consituency
-    consituencyList.forEach(consituencyId => {
+    consituencyList.forEach((consituencyId) => {
       // filter the candidates as per the consituency
       const data = electionDataArr.filter(
-        obj => obj.consituencyId == consituencyId
+        (obj) => obj.consituencyId == consituencyId
       );
 
       let maxVotes = 0;
       let party = [];
 
-      data.forEach(obj => {
+      data.forEach((obj) => {
         if (maxVotes <= obj.votes && obj.votes > 0) {
           maxVotes = obj.votes;
           party.push(obj.candidateParty);
@@ -569,7 +586,7 @@ const electionResult = async address => {
       });
       // console.log("win party", maxVotes, party);
       if (party.length == 1) {
-        partyCount.forEach(obj => {
+        partyCount.forEach((obj) => {
           if (obj.party === party[0]) {
             obj.count++;
           }
@@ -579,14 +596,14 @@ const electionResult = async address => {
     //console.log("PAr", partyCount);
     let winningParty = [];
     let winningSeats = partyCount
-      .map(party => party.count)
+      .map((party) => party.count)
       .reduce((a, b) => {
         // console.log("a,b", a, b);
         return Math.max(a, b);
       });
     console.log("wseats", winningSeats);
 
-    partyCount.forEach(obj => {
+    partyCount.forEach((obj) => {
       if (winningSeats <= obj.count) {
         winningSeats = obj.count;
         winningParty.push(obj.party);
@@ -622,5 +639,5 @@ module.exports = {
   getCandidateVotes,
   closeElection,
   electionResult,
-  electionData
+  electionData,
 };
