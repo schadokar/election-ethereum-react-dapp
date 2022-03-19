@@ -1,5 +1,17 @@
 # Voting Project
 
+I created this project for fun to learn the blockchain.  
+It doesn't have proper form validation.
+
+> DON'T use this project in PRODUCTION. IT is only useful for EDUCATIONAL Purpose.
+
+## Support this project
+
+```
+bitcoin: 37bRVCouQ3TW5XMMAmkZ5S8t3ueqdLt7Cs
+ethereum: 0x04676E1A013D9554d96752b7429c92612d44A9AB
+```
+
 ## Introduction
 
 This voting project is based on Indian Election Process.
@@ -38,14 +50,17 @@ From Project Root Directory
 
 #### Terminal 1: ganache-cli
 
-#### Terminal 2: 
+#### Terminal 2:
+
 - Step 1: Compile the contract. It will compile and create the binary in the build folder.
+
 ```
 cd ethereum
 node compile.js
 ```
 
 - Step 2: Run the server
+
 ```
 npm run dev
 ```
@@ -68,7 +83,6 @@ Click on Compile to compile the contract.
 
 <img src="./images/compile.PNG"></img>
 
-
 Click on Deploy to deploy the contract.
 
 <img src="./images/deploy.PNG"></img>
@@ -84,53 +98,52 @@ Click on Create.
 
 Go to the new Election.  
 Create the Consituencies for the election.  
-Pass the consituency Id -- Integer   
-Pass the consituency name. String  
+Pass the consituency Id -- Integer  
+Pass the consituency name. String
 
-<img src="./images/add-consituency.PNG"></img>  
-
+<img src="./images/add-consituency.PNG"></img>
 
 ### Step 4:
 
-Click on Register candidates   
+Click on Register candidates
 
-<img src="./images/register-candidate.PNG"> </img>    
+<img src="./images/register-candidate.PNG"> </img>
 
-I have created the extra candidates.   
+I have created the extra candidates.
 
-Click on Candidates to see all the registered candidates.   
+Click on Candidates to see all the registered candidates.
 
-<img src="./images/candidates.PNG"></img>    
+<img src="./images/candidates.PNG"></img>
 
-Click on Register voters   
+Click on Register voters
 
-<img src="./images/register-voter.PNG"></img>    
+<img src="./images/register-voter.PNG"></img>
 
-I have created the extra voters.   
+I have created the extra voters.
 
-Click on the Voters to see all the registered voters.    
+Click on the Voters to see all the registered voters.
 
-<img src="./images/voters.PNG"></img>   
+<img src="./images/voters.PNG"></img>
 
 ### Step 5:
 
-Vote Tab: Cast Vote    
+Vote Tab: Cast Vote
 
-Cast your vote by selecting the voter. Once the voter is selected its respective constituency candidates will gets loaded.  
+Cast your vote by selecting the voter. Once the voter is selected its respective constituency candidates will gets loaded.
 
-<img src="./images/cast-vote.PNG"></img>   
+<img src="./images/cast-vote.PNG"></img>
 
 I casted the remaining votes.
 
 ### Step 6:
 
-Result Tab:  
+Result Tab:
 
-1. Click on the Close Election to close the election   
+1. Click on the Close Election to close the election
 
-<img src="./images/close-election.PNG"></img>   
+<img src="./images/close-election.PNG"></img>
 
-2. Click on the Election Result to get the election result.   
+2. Click on the Election Result to get the election result.
 
 <img src="./images/voting-result.PNG"></img>
 
